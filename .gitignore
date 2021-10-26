@@ -1,0 +1,8 @@
+# shader compilation 
+*.spv
+
+# compilation
+*.out
+
+# vscode
+.vscode
