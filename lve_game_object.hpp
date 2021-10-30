@@ -34,7 +34,7 @@ namespace lve
 
 
         using id_t = unsigned int;
-        static LveGameObject CreateGameObject() {
+        static LveGameObject createGameObject() {
             static id_t currentId = 0;
             return LveGameObject{currentId++};
         }
