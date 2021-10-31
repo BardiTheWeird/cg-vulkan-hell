@@ -29,6 +29,8 @@ namespace lve
     {
         SimpleRenderSystem simpleRenderSystem{lveDevice, lveRenderer.getSwapChainRenderPass()};
         LveCamera camera{};
+        // camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
+        camera.setViewTarget(glm::vec3(0.f, 1.f, 0.f), glm::vec3(0.f, 0.f, 2.5f));
 
         while (!lveWindow.shouldClose())
         {
@@ -36,7 +38,7 @@ namespace lve
 
             float aspect = lveRenderer.getAspectRatio();
             // camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
-            camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
+            camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 50.f);
 
 
             if (auto commandBuffer = lveRenderer.beginFrame()) {
