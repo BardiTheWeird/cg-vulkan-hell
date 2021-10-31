@@ -10,6 +10,7 @@
 #include <glm/gtc/constants.hpp>
 
 // std
+#include <chrono>
 #include <stdexcept>
 #include <array>
 #include <queue>
@@ -29,15 +30,19 @@ namespace lve
     {
         SimpleRenderSystem simpleRenderSystem{lveDevice, lveRenderer.getSwapChainRenderPass()};
         LveCamera camera{};
-        // camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
         camera.setViewTarget(glm::vec3(0.f, 1.f, 0.f), glm::vec3(0.f, 0.f, 2.5f));
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
 
         while (!lveWindow.shouldClose())
         {
             glfwPollEvents();
 
+            auto newTime = std::chrono::high_resolution_clock::now();
+            auto frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            currentTime = newTime;
+
             float aspect = lveRenderer.getAspectRatio();
-            // camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
             camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 50.f);
 
 
