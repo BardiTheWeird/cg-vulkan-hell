@@ -2,29 +2,44 @@
 
 #include "lve_device.hpp"
 
+#include "lve_utils.hpp"
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 
-//std
+// std
+#include <memory>
 #include <vector>
+#include <unordered_map>
 
 namespace lve {
     class LveModel {
     public:
         
         struct Vertex {
-            glm::vec3 position;
-            glm::vec3 color;
+            glm::vec3 position{};
+            glm::vec3 color{};
+            glm::vec3 normal{};
+            glm::vec2 uv{};
 
             static std::vector<VkVertexInputBindingDescription> getBindingDescriptions();
             static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
+
+            bool operator==(const Vertex& other) const {
+                return other.position == position
+                    && other.color == color
+                    && other.normal == normal
+                    && other.uv == uv;
+            }
         };
 
         struct Data
         {
             std::vector<Vertex> vertices{};
             std::vector<uint32_t> indices{};
+
+            void loadModel(const std::string& filepath);
         };
         
 
@@ -33,6 +48,8 @@ namespace lve {
 
         LveModel(const LveModel&) = delete;
         LveModel &operator=(const LveModel&) = delete;
+
+        static std::unique_ptr<LveModel> createModelFromFile(LveDevice& device, const std::string& filepath);
 
         void bind(VkCommandBuffer commandBuffer);
         void draw(VkCommandBuffer commandBuffer);
