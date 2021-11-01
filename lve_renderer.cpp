@@ -55,11 +55,6 @@ namespace lve
         {
             throw std::runtime_error("failed to create command buffers");
         }
-
-        for (int i = 0; i < commandBuffers.size(); i++)
-        {
-
-        }
     }
 
     void LveRenderer::freeCommandBuffers() {
