@@ -22,6 +22,7 @@ namespace lve {
             void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
             bool wasWindowResized() { return frameBufferResized; }
             void resetWindowResizedFlag() { frameBufferResized = false; }
+            GLFWwindow* getGlfwWindow() { return window; }
 
         private:
             GLFWwindow* window;

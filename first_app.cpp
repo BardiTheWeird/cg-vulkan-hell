@@ -1,5 +1,6 @@
 #include "first_app.hpp"
 
+#include "keyboard_movement_controller.hpp"
 #include "simple_render_system.hpp"
 #include "lve_camera.hpp"
 
@@ -30,7 +31,9 @@ namespace lve
     {
         SimpleRenderSystem simpleRenderSystem{lveDevice, lveRenderer.getSwapChainRenderPass()};
         LveCamera camera{};
-        camera.setViewTarget(glm::vec3(0.f, 1.f, 0.f), glm::vec3(0.f, 0.f, 2.5f));
+
+        auto viewerObject = LveGameObject::createGameObject();
+        KeyboardMovementController cameraController{};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -41,6 +44,9 @@ namespace lve
             auto newTime = std::chrono::high_resolution_clock::now();
             auto frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
+
+            cameraController.moveInPlaneXZ(lveWindow.getGlfwWindow(), frameTime, viewerObject);
+            camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
             float aspect = lveRenderer.getAspectRatio();
             camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 50.f);
