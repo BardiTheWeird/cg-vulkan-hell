@@ -91,5 +91,14 @@ namespace lve
         // smoothVase.transform.scale = {.5f, .5f, .5f};
 
         gameObjects.push_back(std::move(smoothVase));
+
+        std::shared_ptr<LveModel> lveModel4 = LveModel::createModelFromFile(lveDevice, "models/flat_vase.obj");
+
+        auto flatVase = LveGameObject::createGameObject();
+        flatVase.model = lveModel3;
+        flatVase.transform.translation = {-.5f, 0.f, 2.5f};
+        flatVase.transform.scale = {1.f, 1.f, 3.f};
+
+        gameObjects.push_back(std::move(flatVase));
     }
 }

@@ -27,8 +27,6 @@ namespace lve {
         float currentMoveSpeed{0.f};
         float moveAcceleration{.3f};
 
-        float turnSpeed{.75f};
-        float currentTurnSpeed{0.f};
-        float turnAcceleration{.1f};
+        float turnSpeed{1.5f};
     };
 }

@@ -12,11 +12,7 @@ namespace lve {
         if (glfwGetKey(window, keys.lookDown) == GLFW_PRESS) rotate.x -= 1.f;
 
         if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) {
-            currentTurnSpeed = std::clamp(currentTurnSpeed + turnAcceleration, 0.f, moveSpeed);
-            gameObject.transform.rotation += currentTurnSpeed * dt * glm::normalize(rotate);
-        }
-        else {
-            currentTurnSpeed = 0.f;
+            gameObject.transform.rotation += turnSpeed * dt * glm::normalize(rotate);
         }
 
         gameObject.transform.rotation.x = glm::clamp(gameObject.transform.rotation.x, -1.5f, 1.5f);
