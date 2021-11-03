@@ -69,7 +69,7 @@ namespace lve
 
 
     void SimpleRenderSystem::renderGameObjects(
-            FrameInfo frameInfo, 
+            FrameInfo& frameInfo, 
             std::vector<LveGameObject>& gameObjects) {
         lvePipeline->bind(frameInfo.commandBuffer);
 

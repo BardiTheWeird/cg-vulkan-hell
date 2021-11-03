@@ -33,17 +33,17 @@ namespace lve
 
     FirstApp::~FirstApp() {}
 
-    void FirstApp::run()
-    {
-        LveBuffer globalUbo{
-            lveDevice,
-            sizeof(GlobalUbo),
-            LveSwapChain::MAX_FRAMES_IN_FLIGHT,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-            lveDevice.properties.limits.minUniformBufferOffsetAlignment,
-        };
-        globalUbo.map();
+    void FirstApp::run() {
+        std::vector<std::unique_ptr<LveBuffer>> uboBuffers(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i = 0; i < uboBuffers.size(); i++) {
+            uboBuffers[i] = std::make_unique<LveBuffer>(
+                lveDevice,
+                sizeof(GlobalUbo),
+                1,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+            uboBuffers[i]->map();
+        }
 
         SimpleRenderSystem simpleRenderSystem{lveDevice, lveRenderer.getSwapChainRenderPass()};
         LveCamera camera{};
@@ -52,36 +52,28 @@ namespace lve
         KeyboardMovementController cameraController{};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
-
-        while (!lveWindow.shouldClose())
-        {
+        while (!lveWindow.shouldClose()) {
             glfwPollEvents();
 
             auto newTime = std::chrono::high_resolution_clock::now();
-            auto frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
 
             cameraController.moveInPlaneXZ(lveWindow.getGlfwWindow(), frameTime, viewerObject);
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
             float aspect = lveRenderer.getAspectRatio();
-            camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 50.f);
-
+            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
 
             if (auto commandBuffer = lveRenderer.beginFrame()) {
                 int frameIndex = lveRenderer.getFrameIndex();
-                FrameInfo frameInfo{
-                    frameIndex, 
-                    frameTime, 
-                    commandBuffer,
-                    camera
-                };
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera};
 
                 // update
                 GlobalUbo ubo{};
                 ubo.projectionView = camera.getProjectionMatrix() * camera.getViewMatrix();
-                globalUbo.writeToIndex(&ubo, frameIndex);
-                globalUbo.flushIndex(frameIndex);
+                uboBuffers[frameIndex]->writeToBuffer(&ubo);
+                uboBuffers[frameIndex]->flush();
 
                 // render
                 lveRenderer.beginSwapChainRenderPass(commandBuffer);
@@ -89,9 +81,9 @@ namespace lve
                 lveRenderer.endSwapChainRenderPass(commandBuffer);
                 lveRenderer.endFrame();
             }
-        }
+    }
 
-        vkDeviceWaitIdle(lveDevice.device());
+    vkDeviceWaitIdle(lveDevice.device());
     }
 
     void FirstApp::loadGameObjects() {
