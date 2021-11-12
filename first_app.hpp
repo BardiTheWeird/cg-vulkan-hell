@@ -7,11 +7,29 @@
 #include "lve_renderer.hpp"
 #include "lve_descriptors.hpp"
 
+#define MAX_LIGHT_SOURCES 128
+
 // std
 #include <memory>
 #include <vector>
 
 namespace lve {
+
+    struct GlobalUboParameters
+    {
+        int lightSourceCount{0};
+        float ambientLighting{.02f};
+        int misc1{0};
+        int misc2{0};
+    };
+
+    struct GlobalUbo {
+        glm::mat4 projectionView{1.f};
+
+        GlobalUboParameters parameters{0, .02f};
+        // glm::ivec4 lightSourceCount{0};
+        LightSourceDTO lightSources[MAX_LIGHT_SOURCES];
+    };
     
     class FirstApp {
     public:
@@ -29,6 +47,8 @@ namespace lve {
 
     private:
         void loadGameObjects();
+        void getLightSources(GlobalUbo& ubo);
+        void moveOnSchedule(float frameTime);
 
         LveWindow lveWindow{WIDTH, HEIGHT, "Hello, Vulkan!"};
         LveDevice lveDevice{lveWindow};

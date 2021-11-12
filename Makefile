@@ -26,3 +26,5 @@ test: a.out
 
 clean:
 	rm -f a.out
+
+shaders: $(vertObjFiles) $(fragObjFiles)

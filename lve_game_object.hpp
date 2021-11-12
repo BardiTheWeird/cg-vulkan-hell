@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lve_model.hpp"
+#include "light_source.hpp"
 
 // libs
 #include <glm/gtc/matrix_transform.hpp>
@@ -40,6 +41,7 @@ namespace lve
         std::shared_ptr<LveModel> model{};
         glm::vec3 color{};
         TransformComponent transform{};
+        std::shared_ptr<LightSource> lightSource = nullptr;
 
     private:
         LveGameObject(id_t objId) : id{objId} {};

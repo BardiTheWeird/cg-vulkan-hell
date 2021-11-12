@@ -4,6 +4,8 @@
 #include "simple_render_system.hpp"
 #include "lve_camera.hpp"
 #include "lve_buffer.hpp"
+#include "light_source.hpp"
+
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -20,11 +22,6 @@
 
 namespace lve
 {
-
-    struct GlobalUbo {
-        glm::mat4 projectionView{1.f};
-        glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
-    };
 
     FirstApp::FirstApp()
     {
@@ -80,6 +77,8 @@ namespace lve
             float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
 
+            moveOnSchedule(frameTime);
+
             cameraController.moveInPlaneXZ(lveWindow.getGlfwWindow(), frameTime, viewerObject);
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
@@ -99,6 +98,9 @@ namespace lve
                 // update
                 GlobalUbo ubo{};
                 ubo.projectionView = camera.getProjectionMatrix() * camera.getViewMatrix();
+
+                getLightSources(ubo);
+
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
@@ -150,5 +152,59 @@ namespace lve
         flatVase.transform.scale = {1.f, 1.f, 3.f};
 
         gameObjects.push_back(std::move(flatVase));
+
+        // directional lights
+        LightSource light1{};
+        light1.turnedOn = true;
+        light1.kind = LightSourceKind::DirectionalLight;
+        light1.value1 = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+
+        auto light1GameObject = LveGameObject::createGameObject();
+        light1GameObject.lightSource = std::make_shared<LightSource>(std::move(light1));
+        gameObjects.push_back(std::move(light1GameObject));
+
+        LightSource light2{};
+        light2.turnedOn = true;
+        light2.kind = LightSourceKind::DirectionalLight;
+        light2.value1 = glm::normalize(glm::vec3{-1.f, 3.f, 1.f});
+
+        auto light2GameObject = LveGameObject::createGameObject();
+        light2GameObject.lightSource = std::make_shared<LightSource>(std::move(light2));
+        // gameObjects.push_back(std::move(light2GameObject));
+    }
+
+    void FirstApp::getLightSources(GlobalUbo& ubo) {
+        int index{0};
+        for (auto& obj : gameObjects) {
+            auto lightSource = obj.lightSource;
+            if (lightSource == nullptr || lightSource->turnedOn == false) {
+                continue;
+            }
+
+            auto transform = obj.transform;
+
+            auto rotatedDirection = transform.mat4() * glm::vec4{lightSource->value1, 0.f};
+            auto dto = lightSource->toDTO();
+            dto.value1 = rotatedDirection;
+
+            ubo.lightSources[index] = dto;
+            if (++index >= MAX_LIGHT_SOURCES) {
+                break;
+            }
+        }
+        ubo.parameters.lightSourceCount = std::move(index);
+    }
+
+    void FirstApp::moveOnSchedule(float frameTime) {
+        float speed = 1.f;
+        for (auto& obj : gameObjects) {
+            auto lightSource = obj.lightSource;
+            if (lightSource == nullptr || lightSource->turnedOn == false) {
+                continue;
+            }
+
+            obj.transform.rotation.z = glm::mod(obj.transform.rotation.z + speed * frameTime, glm::two_pi<float>());
+            obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + (speed / 2) * frameTime, glm::two_pi<float>());
+        }
     }
 }

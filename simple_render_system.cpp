@@ -87,6 +87,10 @@ namespace lve
         );
 
         for (auto& obj: gameObjects) {
+            if (obj.model == nullptr) {
+                continue;
+            }
+            
             SimplePushConstantData push{};
             push.modelMatrix = obj.transform.mat4();
             push.normalMatrix = obj.transform.normalMatrix();
