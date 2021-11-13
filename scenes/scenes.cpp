@@ -5,6 +5,8 @@ namespace lve {
     std::vector<LveGameObject> Scenes::loadTestScene1(LveDevice& device) {
         std::vector<LveGameObject> gameObjects{};
 
+        loadCoordinateSystem(device, gameObjects);
+
         std::shared_ptr<LveModel> lveModel = LveModel::createModelFromFile(device, "models/cube.obj");
 
         auto cube = LveGameObject::createGameObject();
@@ -62,13 +64,14 @@ namespace lve {
         pointLight1.model = pointLightModel;
         pointLight1.lightSource = std::make_shared<LightSource>(LightSource::createPoint({0.f, 0.f, 0.f}, 1000));
 
-        pointLight1.transform.translation = {3.f, 0.f, 3.f};
+        pointLight1.transform.translation = {0.f, -3.f, 3.f};
         pointLight1.transform.scale = {.3f, .3f, .3f};
 
-        // CircularMovementComponent pointLight1CircularMovement{};
-        // pointLight1.circularMovement = std::make_shared<CircularMovementComponent>(pointLight1CircularMovement);
-        // pointLight1.circularMovement->center = {-1.f, -1.f, -1.f};
-        // pointLight1.circularMovement->speed = 3.f;
+        CircularMovementComponent pointLight1CircularMovement{};
+        pointLight1CircularMovement.center = {0.f, 0.f, 3.f};
+        pointLight1CircularMovement.speed = 1.f;
+        pointLight1CircularMovement.rotation = glm::normalize(glm::vec3{0.f, 0.f, 1.f});
+        pointLight1.circularMovement = std::make_shared<CircularMovementComponent>(pointLight1CircularMovement);        
 
         VelocityAccelerationComponent pointLight1VelocityAcceleration{};
         pointLight1VelocityAcceleration.rotationVelocity = {.2f, .3f, .5f};
@@ -79,5 +82,38 @@ namespace lve {
 
         return gameObjects;
     }
-       
+
+
+    void Scenes::loadCoordinateSystem(LveDevice& device, std::vector<LveGameObject>& gameObjects) {
+        std::shared_ptr<LveModel> originModel = LveModel::createModelFromFile(device, "models/sphere.obj");
+        std::shared_ptr<LveModel> arrowModel = LveModel::createModelFromFile(device, "models/cone.obj");
+
+        auto origin = LveGameObject::createGameObject();
+        origin.model = originModel;
+        origin.transform.scale = {.05f, .05f, .05f};
+
+        auto xArrow = LveGameObject::createGameObject();
+        xArrow.model = arrowModel;
+        xArrow.transform.scale = {.05f, .05f, .05f};
+        xArrow.transform.translation = {0.1f, 0.f, 0.f};
+        xArrow.transform.rotation = {0.f, 0.f, -glm::half_pi<float>()};
+
+        auto yArrow = LveGameObject::createGameObject();
+        yArrow.model = arrowModel;
+        yArrow.transform.scale = {.05f, .05f, .05f};
+        yArrow.transform.translation = {0.f, 0.1f, 0.f};
+        yArrow.transform.rotation = {0.f, glm::half_pi<float>(), 0.f};
+
+        auto zArrow = LveGameObject::createGameObject();
+        zArrow.model = arrowModel;
+        zArrow.transform.scale = {.05f, .05f, .05f};
+        zArrow.transform.translation = {0.f, 0.f, 0.1f};
+        zArrow.transform.rotation = {glm::half_pi<float>(), 0.f, 0.f};
+
+
+        gameObjects.push_back(std::move(origin));
+        gameObjects.push_back(std::move(xArrow));
+        gameObjects.push_back(std::move(yArrow));
+        gameObjects.push_back(std::move(zArrow));
+    }
 }

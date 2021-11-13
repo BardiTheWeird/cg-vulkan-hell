@@ -87,7 +87,7 @@ namespace lve
         );
 
         for (auto& obj: gameObjects) {
-            if (obj.model == nullptr) {
+            if (obj.isVisible && obj.model == nullptr) {
                 continue;
             }
             

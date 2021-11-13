@@ -27,8 +27,8 @@ namespace lve
 
         const id_t getId() { return id; }
 
+        bool isVisible{true};
         std::shared_ptr<LveModel> model{};
-        glm::vec3 color{};
 
         // components
         // required

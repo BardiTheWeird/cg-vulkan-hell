@@ -10,6 +10,9 @@ namespace lve {
 
     struct Scenes {
         static std::vector<LveGameObject> loadTestScene1(LveDevice& device);
+
+    private:
+        static void loadCoordinateSystem(LveDevice& device, std::vector<LveGameObject>& gameObjects);
     };
     
 }

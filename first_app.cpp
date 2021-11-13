@@ -67,6 +67,7 @@ namespace lve
         LveCamera camera{};
 
         auto viewerObject = LveGameObject::createGameObject();
+        viewerObject.transform.translation = {0.f, 0.f, -1.f};
         KeyboardMovementController cameraController{};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
