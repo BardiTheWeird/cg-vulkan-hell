@@ -45,27 +45,18 @@ namespace lve {
         gameObjects.push_back(std::move(flatVase));
 
         // directional lights
-        LightSource directionalLight{};
-        directionalLight.turnedOn = true;
-        directionalLight.kind = LightSourceKind::DirectionalLight;
-        directionalLight.value1 = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
-
-        auto directionalLightGameObject = LveGameObject::createGameObject();
-        directionalLightGameObject.lightSource = std::make_shared<LightSource>(std::move(directionalLight));
-        
-        VelocityAccelerationComponent directionalLightVelocityAcceleration{};
-        directionalLightVelocityAcceleration.rotationVelocity = {.5f, 0.f, 1.f};
+        auto directionalLightGameObject = LightSource::createDirectional(glm::normalize(glm::vec3{1.f, -3.f, -1.f}));
+        // VelocityAccelerationComponent directionalLightVelocityAcceleration{};
+        // directionalLightVelocityAcceleration.rotationVelocity = {.5f, 0.f, 1.f};
+        // directionalLightGameObject.velocityAcceleration = std::make_shared<VelocityAccelerationComponent>(directionalLightVelocityAcceleration);
 
         gameObjects.push_back(std::move(directionalLightGameObject));
 
         // point lights
-        std::shared_ptr<LveModel> pointLightModel = LveModel::createModelFromFile(device, "models/morning-star-light-source.obj");
-        auto pointLight1 = LveGameObject::createGameObject();
-        pointLight1.model = pointLightModel;
-        pointLight1.lightSource = std::make_shared<LightSource>(LightSource::createPoint({0.f, 0.f, 0.f}, 1000));
-
+        auto pointLight1 = LightSource::createPoint({0.f, 0.f, 0.f}, 3.f);
         pointLight1.transform.translation = {0.f, -3.f, 3.f};
         pointLight1.transform.scale = {.3f, .3f, .3f};
+        pointLight1.model = LveModel::createModelFromFile(device, "models/morning-star-light-source.obj");
 
         CircularMovementComponent pointLight1CircularMovement{};
         pointLight1CircularMovement.center = {0.f, 0.f, 3.f};

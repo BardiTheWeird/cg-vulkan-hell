@@ -128,30 +128,11 @@ namespace lve
                 continue;
             }
 
-            auto transform = obj.transform;
-
-            auto rotatedDirection = transform.mat4() * glm::vec4{lightSource->value1, 0.f};
-            auto dto = lightSource->toDTO();
-            dto.value1 = rotatedDirection;
-
-            ubo.lightSources[index] = dto;
+            ubo.lightSources[index] = LightSourceDTO::fromGameObject(obj);
             if (++index >= MAX_LIGHT_SOURCES) {
                 break;
             }
         }
         ubo.parameters.lightSourceCount = std::move(index);
-    }
-
-    void FirstApp::moveOnSchedule(float frameTime) {
-        float speed = 1.f;
-        for (auto& obj : gameObjects) {
-            auto lightSource = obj.lightSource;
-            if (lightSource == nullptr || lightSource->turnedOn == false) {
-                continue;
-            }
-
-            obj.transform.rotation.z = glm::mod(obj.transform.rotation.z + speed * frameTime, glm::two_pi<float>());
-            obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + (speed / 2) * frameTime, glm::two_pi<float>());
-        }
     }
 }
