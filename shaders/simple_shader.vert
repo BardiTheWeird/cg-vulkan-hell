@@ -14,9 +14,9 @@ layout (location = 0) out vec3 fragColor;
 
 struct LightSourceParameters {
     int kind;
-    int misc1;
-    int misc2;
-    int misc3;
+    float par1;
+    float misc2;
+    float misc3;
 };
 
 struct LightSource {

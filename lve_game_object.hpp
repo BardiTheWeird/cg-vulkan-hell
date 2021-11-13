@@ -1,27 +1,16 @@
 #pragma once
 
 #include "lve_model.hpp"
-#include "light_source.hpp"
-
-// libs
-#include <glm/gtc/matrix_transform.hpp>
+#include "components/light_source.hpp"
+#include "components/transform_component.hpp"
+#include "components/velocity_acceleration_component.hpp"
+#include "components/circular_movement_component.hpp"
 
 // std
 #include <memory>
 
 namespace lve
 {
-    struct TransformComponent
-    {
-        glm::vec3 translation{};
-        glm::vec3 scale{1.f, 1.f, 1.f};
-        glm::vec3 rotation{};
-
-        glm::mat4 mat4();
-        glm::mat3 normalMatrix();
-    };
-    
-
     class LveGameObject {
     public:
         LveGameObject(const LveGameObject &) = delete;
@@ -40,8 +29,15 @@ namespace lve
 
         std::shared_ptr<LveModel> model{};
         glm::vec3 color{};
+
+        // components
+        // required
         TransformComponent transform{};
+
+        // optional
         std::shared_ptr<LightSource> lightSource = nullptr;
+        std::shared_ptr<VelocityAccelerationComponent> velocityAcceleration = nullptr;
+        std::shared_ptr<CircularMovementComponent> circularMovement = nullptr;
 
     private:
         LveGameObject(id_t objId) : id{objId} {};

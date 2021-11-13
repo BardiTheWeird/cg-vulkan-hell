@@ -4,8 +4,8 @@
 #include "simple_render_system.hpp"
 #include "lve_camera.hpp"
 #include "lve_buffer.hpp"
-#include "light_source.hpp"
-
+#include "game_systems.hpp"
+#include "scenes/scenes.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -77,13 +77,13 @@ namespace lve
             float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
 
-            moveOnSchedule(frameTime);
+            GameSystems::executeAll(gameObjects, frameTime);
 
             cameraController.moveInPlaneXZ(lveWindow.getGlfwWindow(), frameTime, viewerObject);
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
             float aspect = lveRenderer.getAspectRatio();
-            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
+            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 500.f);
 
             if (auto commandBuffer = lveRenderer.beginFrame()) {
                 int frameIndex = lveRenderer.getFrameIndex();
@@ -116,61 +116,7 @@ namespace lve
     }
 
     void FirstApp::loadGameObjects() {
-        std::shared_ptr<LveModel> lveModel = LveModel::createModelFromFile(lveDevice, "models/cube.obj");
-
-        auto cube = LveGameObject::createGameObject();
-        cube.model = lveModel;
-        cube.transform.translation = {.0f, .0f, 5.5f};
-        // cube.transform.scale = {.5f, .5f, .5f};
-
-        gameObjects.push_back(std::move(cube));
-
-        std::shared_ptr<LveModel> lveModel2 = LveModel::createModelFromFile(lveDevice, "models/colored_cube.obj");
-
-        auto cube2 = LveGameObject::createGameObject();
-        cube2.model = lveModel2;
-        cube2.transform.translation = {1.f, 0.f, 2.5f};
-        cube2.transform.rotation = {0.f, glm::quarter_pi<float>(), 0.f};
-        cube2.transform.scale = {.5f, .5f, .5f};
-
-        gameObjects.push_back(std::move(cube2));
-
-        std::shared_ptr<LveModel> lveModel3 = LveModel::createModelFromFile(lveDevice, "models/smooth_vase.obj");
-
-        auto smoothVase = LveGameObject::createGameObject();
-        smoothVase.model = lveModel3;
-        smoothVase.transform.translation = {-1.f, 0.f, 2.5f};
-        // smoothVase.transform.scale = {.5f, .5f, .5f};
-
-        gameObjects.push_back(std::move(smoothVase));
-
-        std::shared_ptr<LveModel> lveModel4 = LveModel::createModelFromFile(lveDevice, "models/flat_vase.obj");
-
-        auto flatVase = LveGameObject::createGameObject();
-        flatVase.model = lveModel3;
-        flatVase.transform.translation = {-.5f, 0.f, 2.5f};
-        flatVase.transform.scale = {1.f, 1.f, 3.f};
-
-        gameObjects.push_back(std::move(flatVase));
-
-        // directional lights
-        LightSource light1{};
-        light1.turnedOn = true;
-        light1.kind = LightSourceKind::DirectionalLight;
-        light1.value1 = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
-
-        auto light1GameObject = LveGameObject::createGameObject();
-        light1GameObject.lightSource = std::make_shared<LightSource>(std::move(light1));
-        gameObjects.push_back(std::move(light1GameObject));
-
-        LightSource light2{};
-        light2.turnedOn = true;
-        light2.kind = LightSourceKind::DirectionalLight;
-        light2.value1 = glm::normalize(glm::vec3{-1.f, 3.f, 1.f});
-
-        auto light2GameObject = LveGameObject::createGameObject();
-        light2GameObject.lightSource = std::make_shared<LightSource>(std::move(light2));
-        // gameObjects.push_back(std::move(light2GameObject));
+        gameObjects = std::move(Scenes::loadTestScene1(lveDevice));
     }
 
     void FirstApp::getLightSources(GlobalUbo& ubo) {
