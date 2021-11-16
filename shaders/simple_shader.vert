@@ -14,28 +14,29 @@ layout (location = 0) out vec3 fragColor;
 
 struct LightSourceParameters {
     int kind;
-    float par1;
+    float misc1;
     float misc2;
     float misc3;
 };
 
 struct LightSource {
     LightSourceParameters parameters;
+    vec4 color; // {r, g, b, intensity}
     vec4 value1; // direction OR point of origin
 };
 
-struct UboParameters {
+struct GlobalUboParameters {
     int lightSourceCount;
-    float ambientLighting;
-    int misc1;
-    int misc2;
+    int unused1;
+    int unused2;
+    int unused3;
 };
 
 layout (set = 0, binding = 0) uniform GlobalUbo {
     mat4 projectionViewMatrix;
-    UboParameters parameters;
+    vec4 ambientColor;
+    GlobalUboParameters parameters;
     LightSource lightSources[MAX_LIGHT_SOURCES];
-    // LightSource lightSource;
 } ubo;
 
 layout(push_constant) uniform Push {
@@ -43,25 +44,36 @@ layout(push_constant) uniform Push {
     mat4 normalMatrix; 
 } push;
 
-// const float AMBIENT = 0.02;
+const float POINT_LIGHT_ABSOLUTE_BRIGHTNESS_RADIUS = 0.1;
 
 void main() {
-    gl_Position = ubo.projectionViewMatrix * push.modelMatrix * vec4(position, 1.0);
+    vec4 positionWorld = push.modelMatrix * vec4(position, 1.0);
+    gl_Position = ubo.projectionViewMatrix * positionWorld;
 
     vec3 normalWorldSpace = normalize(mat3(push.normalMatrix) * normal);
 
-    float lightIntensity = ubo.parameters.ambientLighting;
+    vec3 diffuseLight;
+    diffuseLight.x = diffuseLight.y = diffuseLight.z = 0;
 
     for (int i = 0; i < ubo.parameters.lightSourceCount; i++) {
         LightSource lightSource = ubo.lightSources[i];
-    
+        vec3 lightColor = lightSource.color.xyz * lightSource.color.w;
+
         if (lightSource.parameters.kind == DirectionalLight) {
-            vec3 direction = vec3(lightSource.value1);
-    
-            float calculationResult = max(dot(normalWorldSpace, direction), 0);
-            lightIntensity = lightIntensity + calculationResult;
+            vec3 direction = lightSource.value1.xyz;            
+            diffuseLight = diffuseLight + lightColor * max(dot(normalWorldSpace, direction), 0);
+        }
+        else if (lightSource.parameters.kind == PointLight) {
+            vec3 lightPosition = lightSource.value1.xyz;
+            vec3 directionToLight = lightPosition - positionWorld.xyz;
+
+            float attenuation = 1.0 / dot(directionToLight, directionToLight);
+            float luminanceAtVert = max(dot(normalWorldSpace, normalize(directionToLight)), 0);
+
+            diffuseLight = diffuseLight + lightColor * attenuation * luminanceAtVert;
         }
     }
 
-    fragColor = lightIntensity * color;
+    vec3 ambientLight = ubo.ambientColor.xyz * ubo.ambientColor.w;
+    fragColor = (diffuseLight + ambientLight) * color;
 }

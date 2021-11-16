@@ -7,9 +7,10 @@
 namespace lve {
 
     // LightSource public
-    LveGameObject LightSource::createDirectional(glm::vec3 direction) {
+    LveGameObject LightSource::createDirectional(glm::vec3 direction, glm::vec4 color) {
         LightSource source{};
         source.kind = LightSourceKind::DirectionalLight;
+        source.color = color;
 
         auto gameObject = createGameObjectWithLightSource(std::move(source));
         gameObject.transform.rotation = direction;
@@ -17,10 +18,13 @@ namespace lve {
         return gameObject;
     }
 
-    LveGameObject LightSource::createPoint(glm::vec3 position, float radius) {
+    LveGameObject LightSource::createPoint(glm::vec3 position, float radius, glm::vec4 color) {
         LightSource source{};
         source.kind = PointLight;
+        source.color = color;
         source.radius = radius;
+
+        source.color.w = BRIGHTNESS_AT_RADIUS * radius * radius;
 
         auto gameObject = createGameObjectWithLightSource(std::move(source));
         gameObject.transform.translation = position;
@@ -46,6 +50,7 @@ namespace lve {
 
         LightSourceDTO dto{};
         dto.parameters.kind = lightSource->kind;
+        dto.color = lightSource->color;
 
         switch (lightSource->kind)
         {
@@ -54,12 +59,11 @@ namespace lve {
             break;
 
         case LightSourceKind::PointLight:
-            dto.parameters.brightness = MIN_BRIGHTNESS * lightSource->radius * lightSource->radius;
             dto.value1 = {obj.transform.translation, 0.f};
             break;
         
         default:
-            throw std::runtime_error("can't convert all LightSourceKinds to LightSourceDTO");
+            throw std::runtime_error("can't convert some LightSourceKinds to LightSourceDTO");
             break;
         }
 

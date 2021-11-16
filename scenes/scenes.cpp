@@ -7,19 +7,26 @@ namespace lve {
 
         loadCoordinateSystem(device, gameObjects);
 
-        std::shared_ptr<LveModel> lveModel = LveModel::createModelFromFile(device, "models/cube.obj");
+        std::shared_ptr<LveModel> whiteCubeInvertedNormals = LveModel::createModelFromFile(device, "models/cube-inverted-normals.obj");
+        std::shared_ptr<LveModel> whiteCubeModel = LveModel::createModelFromFile(device, "models/cube.obj");
+        std::shared_ptr<LveModel> coloreCubeModel = LveModel::createModelFromFile(device, "models/colored_cube.obj");
+
+        auto fourWallsObject = LveGameObject::createGameObject();
+        fourWallsObject.model = whiteCubeInvertedNormals;
+        fourWallsObject.transform.scale = {5.f, 5.f, 15.f};
+        fourWallsObject.transform.translation = {0.f, -4.f, 13.f};
+        
+        gameObjects.push_back(std::move(fourWallsObject));
 
         auto cube = LveGameObject::createGameObject();
-        cube.model = lveModel;
+        cube.model = whiteCubeModel;
         cube.transform.translation = {.0f, .0f, 5.5f};
         // cube.transform.scale = {.5f, .5f, .5f};
 
         gameObjects.push_back(std::move(cube));
 
-        std::shared_ptr<LveModel> lveModel2 = LveModel::createModelFromFile(device, "models/colored_cube.obj");
-
         auto cube2 = LveGameObject::createGameObject();
-        cube2.model = lveModel2;
+        cube2.model = coloreCubeModel;
         cube2.transform.translation = {1.f, 0.f, 2.5f};
         cube2.transform.rotation = {0.f, glm::quarter_pi<float>(), 0.f};
         cube2.transform.scale = {.5f, .5f, .5f};
@@ -50,12 +57,12 @@ namespace lve {
         // directionalLightVelocityAcceleration.rotationVelocity = {.5f, 0.f, 1.f};
         // directionalLightGameObject.velocityAcceleration = std::make_shared<VelocityAccelerationComponent>(directionalLightVelocityAcceleration);
 
-        gameObjects.push_back(std::move(directionalLightGameObject));
+        // gameObjects.push_back(std::move(directionalLightGameObject));
 
         // point lights
-        auto pointLight1 = LightSource::createPoint({0.f, 0.f, 0.f}, 3.f);
+        auto pointLight1 = LightSource::createPoint({0.f, 0.f, 0.f}, 5.f, {0.f, 1.f, 1.f, 0.f});
         pointLight1.transform.translation = {0.f, -3.f, 3.f};
-        pointLight1.transform.scale = {.3f, .3f, .3f};
+        pointLight1.transform.scale = {.1f, .1f, .1f};
         pointLight1.model = LveModel::createModelFromFile(device, "models/morning-star-light-source.obj");
 
         CircularMovementComponent pointLight1CircularMovement{};
@@ -70,6 +77,25 @@ namespace lve {
         pointLight1.velocityAcceleration = std::make_shared<VelocityAccelerationComponent>(pointLight1VelocityAcceleration);
 
         gameObjects.push_back(std::move(pointLight1));
+
+
+        auto pointLight2 = LightSource::createPoint({0.f, 0.f, 0.f}, 5.f, {1.f, 1.f, 0.f, 0.f});
+        pointLight2.transform.translation = {0.f, -4.f, 4.f};
+        pointLight2.transform.scale = {.3f, .3f, .3f};
+        pointLight2.model = LveModel::createModelFromFile(device, "models/morning-star-light-source.obj");
+
+        CircularMovementComponent pointLight2CircularMovement{};
+        pointLight2CircularMovement.center = {0.f, 3.f, 3.f};
+        pointLight2CircularMovement.speed = .8f;
+        pointLight2CircularMovement.rotation = glm::normalize(glm::vec3{0.f, 1.f, 0.f});
+        pointLight2.circularMovement = std::make_shared<CircularMovementComponent>(pointLight2CircularMovement);        
+
+        VelocityAccelerationComponent pointLight2VelocityAcceleration{};
+        pointLight2VelocityAcceleration.rotationVelocity = {.2f, .1f, .3f};
+
+        pointLight2.velocityAcceleration = std::make_shared<VelocityAccelerationComponent>(pointLight2VelocityAcceleration);
+
+        gameObjects.push_back(std::move(pointLight2));
 
         return gameObjects;
     }

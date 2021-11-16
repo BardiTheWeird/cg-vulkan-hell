@@ -15,19 +15,17 @@
 
 namespace lve {
 
-    struct GlobalUboParameters
-    {
-        int lightSourceCount{0};
-        float ambientLighting{.02f};
-        int misc1{0};
-        int misc2{0};
+    struct GlobalUboParameters {
+        int lightSourceCount;
+        int unused1;
+        int unused2;
+        int unused3;
     };
 
     struct GlobalUbo {
         glm::mat4 projectionView{1.f};
-
-        GlobalUboParameters parameters{0, .02f};
-        // glm::ivec4 lightSourceCount{0};
+        glm::vec4 ambientColor{1.f, 1.f, 1.f, .02f};
+        GlobalUboParameters parameters;
         LightSourceDTO lightSources[MAX_LIGHT_SOURCES];
     };
     
