@@ -6,6 +6,8 @@ layout(location = 2) in vec3 normal;
 layout(location = 3) in vec2 uv;
 
 layout (location = 0) out vec3 fragColor; 
+layout (location = 1) out vec3 fragPosWorld;
+layout (location = 2) out vec3 fragNormalWorld;
 
 #define MAX_LIGHT_SOURCES 128
 
@@ -44,36 +46,11 @@ layout(push_constant) uniform Push {
     mat4 normalMatrix; 
 } push;
 
-const float POINT_LIGHT_ABSOLUTE_BRIGHTNESS_RADIUS = 0.1;
-
 void main() {
     vec4 positionWorld = push.modelMatrix * vec4(position, 1.0);
     gl_Position = ubo.projectionViewMatrix * positionWorld;
 
-    vec3 normalWorldSpace = normalize(mat3(push.normalMatrix) * normal);
-
-    vec3 diffuseLight;
-    diffuseLight.x = diffuseLight.y = diffuseLight.z = 0;
-
-    for (int i = 0; i < ubo.parameters.lightSourceCount; i++) {
-        LightSource lightSource = ubo.lightSources[i];
-        vec3 lightColor = lightSource.color.xyz * lightSource.color.w;
-
-        if (lightSource.parameters.kind == DirectionalLight) {
-            vec3 direction = lightSource.value1.xyz;            
-            diffuseLight = diffuseLight + lightColor * max(dot(normalWorldSpace, direction), 0);
-        }
-        else if (lightSource.parameters.kind == PointLight) {
-            vec3 lightPosition = lightSource.value1.xyz;
-            vec3 directionToLight = lightPosition - positionWorld.xyz;
-
-            float attenuation = 1.0 / dot(directionToLight, directionToLight);
-            float luminanceAtVert = max(dot(normalWorldSpace, normalize(directionToLight)), 0);
-
-            diffuseLight = diffuseLight + lightColor * attenuation * luminanceAtVert;
-        }
-    }
-
-    vec3 ambientLight = ubo.ambientColor.xyz * ubo.ambientColor.w;
-    fragColor = (diffuseLight + ambientLight) * color;
+    fragNormalWorld = normalize(mat3(push.normalMatrix) * normal);
+    fragPosWorld = positionWorld.xyz;
+    fragColor = color;
 }
