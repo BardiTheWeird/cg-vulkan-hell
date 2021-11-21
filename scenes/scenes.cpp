@@ -2,8 +2,8 @@
 
 namespace lve {
 
-    std::vector<LveGameObject> Scenes::loadTestScene1(LveDevice& device) {
-        std::vector<LveGameObject> gameObjects{};
+    LveGameObject::Map Scenes::loadTestScene1(LveDevice& device) {
+        LveGameObject::Map gameObjects{};
 
         loadCoordinateSystem(device, gameObjects);
 
@@ -16,14 +16,14 @@ namespace lve {
         fourWallsObject.transform.scale = {5.f, 5.f, 15.f};
         fourWallsObject.transform.translation = {0.f, -4.f, 13.f};
         
-        gameObjects.push_back(std::move(fourWallsObject));
+        gameObjects.emplace(fourWallsObject.getId(), std::move(fourWallsObject));
 
         auto cube = LveGameObject::createGameObject();
         cube.model = whiteCubeModel;
         cube.transform.translation = {.0f, .0f, 5.5f};
         // cube.transform.scale = {.5f, .5f, .5f};
 
-        gameObjects.push_back(std::move(cube));
+        gameObjects.emplace(cube.getId(), std::move(cube));
 
         auto cube2 = LveGameObject::createGameObject();
         cube2.model = coloreCubeModel;
@@ -31,7 +31,7 @@ namespace lve {
         cube2.transform.rotation = {0.f, glm::quarter_pi<float>(), 0.f};
         cube2.transform.scale = {.5f, .5f, .5f};
 
-        gameObjects.push_back(std::move(cube2));
+        gameObjects.emplace(cube2.getId(), std::move(cube2));
 
         std::shared_ptr<LveModel> lveModel3 = LveModel::createModelFromFile(device, "models/smooth_vase.obj");
 
@@ -40,7 +40,7 @@ namespace lve {
         smoothVase.transform.translation = {-1.f, 0.f, 2.5f};
         // smoothVase.transform.scale = {.5f, .5f, .5f};
 
-        gameObjects.push_back(std::move(smoothVase));
+        gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
         std::shared_ptr<LveModel> lveModel4 = LveModel::createModelFromFile(device, "models/flat_vase.obj");
 
@@ -49,7 +49,7 @@ namespace lve {
         flatVase.transform.translation = {-.5f, 0.f, 2.5f};
         flatVase.transform.scale = {1.f, 1.f, 3.f};
 
-        gameObjects.push_back(std::move(flatVase));
+        gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
         // directional lights
         auto directionalLightGameObject = LightSource::createDirectional(glm::normalize(glm::vec3{1.f, -3.f, -1.f}));
@@ -57,7 +57,7 @@ namespace lve {
         // directionalLightVelocityAcceleration.rotationVelocity = {.5f, 0.f, 1.f};
         // directionalLightGameObject.velocityAcceleration = std::make_shared<VelocityAccelerationComponent>(directionalLightVelocityAcceleration);
 
-        // gameObjects.push_back(std::move(directionalLightGameObject));
+        // gameObjects.emplace(directionalLightGameObject.getId(), std::move(directionalLightGameObject));
 
         // point lights
         auto pointLight1 = LightSource::createPoint({0.f, 0.f, 0.f}, 5.f, {0.f, 1.f, 1.f, 0.f});
@@ -76,7 +76,7 @@ namespace lve {
 
         pointLight1.velocityAcceleration = std::make_shared<VelocityAccelerationComponent>(pointLight1VelocityAcceleration);
 
-        gameObjects.push_back(std::move(pointLight1));
+        gameObjects.emplace(pointLight1.getId(), std::move(pointLight1));
 
 
         auto pointLight2 = LightSource::createPoint({0.f, 0.f, 0.f}, 5.f, {1.f, 1.f, 0.f, 0.f});
@@ -95,13 +95,13 @@ namespace lve {
 
         pointLight2.velocityAcceleration = std::make_shared<VelocityAccelerationComponent>(pointLight2VelocityAcceleration);
 
-        gameObjects.push_back(std::move(pointLight2));
+        gameObjects.emplace(pointLight2.getId(), std::move(pointLight2));
 
         return gameObjects;
     }
 
 
-    void Scenes::loadCoordinateSystem(LveDevice& device, std::vector<LveGameObject>& gameObjects) {
+    void Scenes::loadCoordinateSystem(LveDevice& device, LveGameObject::Map& gameObjects) {
         std::shared_ptr<LveModel> originModel = LveModel::createModelFromFile(device, "models/sphere.obj");
         std::shared_ptr<LveModel> arrowModel = LveModel::createModelFromFile(device, "models/cone.obj");
 
@@ -128,9 +128,9 @@ namespace lve {
         zArrow.transform.rotation = {glm::half_pi<float>(), 0.f, 0.f};
 
 
-        gameObjects.push_back(std::move(origin));
-        gameObjects.push_back(std::move(xArrow));
-        gameObjects.push_back(std::move(yArrow));
-        gameObjects.push_back(std::move(zArrow));
+        gameObjects.emplace(origin.getId(), std::move(origin));
+        gameObjects.emplace(xArrow.getId(), std::move(xArrow));
+        gameObjects.emplace(yArrow.getId(), std::move(yArrow));
+        gameObjects.emplace(zArrow.getId(), std::move(zArrow));
     }
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lve_game_object.hpp"
+#include "lve_frame_info.hpp"
 
 // std
 #include <vector>
@@ -8,8 +8,8 @@
 namespace lve {
 
     struct GameSystems {
-        static void executeAll(std::vector<LveGameObject>& gameObjects, float frameTime);
-        static void move(std::vector<LveGameObject>& gameObjects, float frameTime);
-        static void moveCircle(std::vector<LveGameObject>& gameObjects, float frameTime);
+        static void executeAll(GameSystemInfo& gameSystemInfo);
+        static void move(GameSystemInfo& gameSystemInfo);
+        static void moveCircle(GameSystemInfo& gameSystemInfo);
     };
 }

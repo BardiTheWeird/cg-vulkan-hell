@@ -3,13 +3,16 @@
 
 namespace lve {
 
-    void GameSystems::executeAll(std::vector<LveGameObject>& gameObjects, float frameTime) {
-        move(gameObjects, frameTime);
-        moveCircle(gameObjects, frameTime);
+    void GameSystems::executeAll(GameSystemInfo& gameSystemInfo) {
+        move(gameSystemInfo);
+        moveCircle(gameSystemInfo);
     }
 
-    void GameSystems::move(std::vector<LveGameObject>& gameObjects, float frameTime) {
-        for (auto& obj : gameObjects) {
+    void GameSystems::move(GameSystemInfo& gameSystemInfo) {
+        float frameTime = gameSystemInfo.frameTime;
+
+        for (auto& kv : gameSystemInfo.gameObjects) {
+            auto& obj = kv.second;
             if (obj.velocityAcceleration == nullptr)
                 continue;
 
@@ -22,14 +25,15 @@ namespace lve {
         }
     }
 
-    void GameSystems::moveCircle(std::vector<LveGameObject>& gameObjects, float frameTime) {
-        for (auto& obj : gameObjects) {
+    void GameSystems::moveCircle(GameSystemInfo& gameSystemInfo) {
+        for (auto& kv : gameSystemInfo.gameObjects) {
+            auto& obj = kv.second;
             if (obj.circularMovement == nullptr)
                 continue;
 
             auto circ = obj.circularMovement;
             auto center = circ->center;
-            auto rotation = circ->rotation * circ->speed * frameTime;
+            auto rotation = circ->rotation * circ->speed * gameSystemInfo.frameTime;
 
             auto curPos = obj.transform.translation;
             obj.transform.translation = 

@@ -8,18 +8,21 @@
 
 // std
 #include <memory>
+#include <unordered_map>
 
 namespace lve
 {
     class LveGameObject {
     public:
+        using id_t = unsigned int;
+        using Map = std::unordered_map<id_t, LveGameObject>;
+
         LveGameObject(const LveGameObject &) = delete;
         LveGameObject &operator=(const LveGameObject &) = delete;
         LveGameObject(LveGameObject &&) = default;
         LveGameObject &operator=(LveGameObject &&) = default;
 
 
-        using id_t = unsigned int;
         static LveGameObject createGameObject() {
             static id_t currentId = 0;
             return LveGameObject{currentId++};

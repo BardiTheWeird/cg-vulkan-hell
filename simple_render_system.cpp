@@ -70,9 +70,7 @@ namespace lve
     }
 
 
-    void SimpleRenderSystem::renderGameObjects(
-            FrameInfo& frameInfo, 
-            std::vector<LveGameObject>& gameObjects) {
+    void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
         lvePipeline->bind(frameInfo.commandBuffer);
 
         vkCmdBindDescriptorSets(
@@ -86,7 +84,8 @@ namespace lve
             nullptr
         );
 
-        for (auto& obj: gameObjects) {
+        for (auto& kv: frameInfo.gameObjects) {
+            auto& obj = kv.second;
             if (obj.isVisible && obj.model == nullptr) {
                 continue;
             }

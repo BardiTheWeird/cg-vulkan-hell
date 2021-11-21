@@ -74,17 +74,24 @@ namespace lve
         while (!lveWindow.shouldClose()) {
             glfwPollEvents();
 
+            // frameTime calculation
             auto newTime = std::chrono::high_resolution_clock::now();
             float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
 
-            GameSystems::executeAll(gameObjects, frameTime);
-
+            // camera settings
             cameraController.moveInPlaneXZ(lveWindow.getGlfwWindow(), frameTime, viewerObject);
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
             float aspect = lveRenderer.getAspectRatio();
             camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 500.f);
+
+            GameSystemInfo gameSystemInfo {
+                frameTime,
+                camera,
+                gameObjects,
+            };
+            GameSystems::executeAll(gameSystemInfo);
 
             if (auto commandBuffer = lveRenderer.beginFrame()) {
                 int frameIndex = lveRenderer.getFrameIndex();
@@ -93,7 +100,8 @@ namespace lve
                     frameTime, 
                     commandBuffer, 
                     camera, 
-                    globalDescriptorSets[frameIndex]
+                    globalDescriptorSets[frameIndex],
+                    gameObjects
                 };
 
                 // update
@@ -107,7 +115,7 @@ namespace lve
 
                 // render
                 lveRenderer.beginSwapChainRenderPass(commandBuffer);
-                simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
+                simpleRenderSystem.renderGameObjects(frameInfo);
                 lveRenderer.endSwapChainRenderPass(commandBuffer);
                 lveRenderer.endFrame();
             }
@@ -122,7 +130,8 @@ namespace lve
 
     void FirstApp::getLightSources(GlobalUbo& ubo) {
         int index{0};
-        for (auto& obj : gameObjects) {
+        for (auto& kv : gameObjects) {
+            auto& obj = kv.second;
             auto lightSource = obj.lightSource;
             if (lightSource == nullptr || lightSource->turnedOn == false) {
                 continue;
