@@ -13,7 +13,7 @@ namespace lve {
         static LveGameObject::Map loadTestScene1(LveDevice& device, TextureManager& textureManager);
 
     private:
-        static void loadCoordinateSystem(LveDevice& device, LveGameObject::Map& gameObjects);
+        static void loadCoordinateSystem(LveDevice& device, LveGameObject::Map& gameObjects, TextureManager& textureManager);
     };
     
 }

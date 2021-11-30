@@ -5,9 +5,17 @@ namespace lve {
     LveGameObject::Map Scenes::loadTestScene1(LveDevice& device, TextureManager& textureManager) {
         LveGameObject::Map gameObjects{};
 
-        loadCoordinateSystem(device, gameObjects);
+        loadCoordinateSystem(device, gameObjects, textureManager);
 
         textureManager.addTexture("sui-chan-guitar.jpeg", "sui-chan-guitar");
+        textureManager.addTexture("ina-smile.jpg", "ina-smile");
+        textureManager.addTexture("ina-super-artsy.jpg", "ina-super-artsy");
+        textureManager.addTexture("suisei-fuck-this-shit.jpg", "suisei-fuck-this-shit");
+
+        std::optional<std::string> sui_chan_guitar = {"sui-chan-guitar"};
+        std::optional<std::string> ina_smile = {"ina-smile"};
+        std::optional<std::string> ina_super_artsy = {"ina-super-artsy"};
+        std::optional<std::string> suisei_fuck_this_shit = {"suisei-fuck-this-shit"};
 
         std::shared_ptr<LveModel> whiteCubeInvertedNormals = LveModel::createModelFromFile(device, "models/cube-inverted-normals.obj");
         std::shared_ptr<LveModel> whiteCubeModel = LveModel::createModelFromFile(device, "models/cube.obj");
@@ -18,12 +26,16 @@ namespace lve {
         fourWallsObject.transform.scale = {5.f, 5.f, 15.f};
         fourWallsObject.transform.translation = {0.f, -4.f, 13.f};
         
+        fourWallsObject.textureKey = suisei_fuck_this_shit;
+        
         gameObjects.emplace(fourWallsObject.getId(), std::move(fourWallsObject));
 
         auto cube = LveGameObject::createGameObject();
         cube.model = whiteCubeModel;
         cube.transform.translation = {.0f, .0f, 5.5f};
         // cube.transform.scale = {.5f, .5f, .5f};
+
+        cube.textureKey = ina_smile;
 
         gameObjects.emplace(cube.getId(), std::move(cube));
 
@@ -32,6 +44,8 @@ namespace lve {
         cube2.transform.translation = {1.f, 0.f, 2.5f};
         cube2.transform.rotation = {0.f, glm::quarter_pi<float>(), 0.f};
         cube2.transform.scale = {.5f, .5f, .5f};
+
+        cube2.textureKey = ina_super_artsy;
 
         gameObjects.emplace(cube2.getId(), std::move(cube2));
 
@@ -42,6 +56,8 @@ namespace lve {
         smoothVase.transform.translation = {-1.f, 0.f, 2.5f};
         // smoothVase.transform.scale = {.5f, .5f, .5f};
 
+        smoothVase.textureKey = sui_chan_guitar;
+
         gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
         std::shared_ptr<LveModel> lveModel4 = LveModel::createModelFromFile(device, "models/flat_vase.obj");
@@ -50,6 +66,8 @@ namespace lve {
         flatVase.model = lveModel3;
         flatVase.transform.translation = {-.5f, 0.f, 2.5f};
         flatVase.transform.scale = {1.f, 1.f, 3.f};
+
+        flatVase.textureKey = sui_chan_guitar;
 
         gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
@@ -66,6 +84,8 @@ namespace lve {
         pointLight1.transform.translation = {0.f, -3.f, 3.f};
         pointLight1.transform.scale = {.1f, .1f, .1f};
         pointLight1.model = LveModel::createModelFromFile(device, "models/morning-star-light-source.obj");
+
+        pointLight1.textureKey = sui_chan_guitar;
 
         CircularMovementComponent pointLight1CircularMovement{};
         pointLight1CircularMovement.center = {0.f, 0.f, 3.f};
@@ -86,6 +106,8 @@ namespace lve {
         pointLight2.transform.scale = {.3f, .3f, .3f};
         pointLight2.model = LveModel::createModelFromFile(device, "models/morning-star-light-source.obj");
 
+        pointLight2.textureKey = sui_chan_guitar;
+
         CircularMovementComponent pointLight2CircularMovement{};
         pointLight2CircularMovement.center = {0.f, 3.f, 3.f};
         pointLight2CircularMovement.speed = .8f;
@@ -99,41 +121,41 @@ namespace lve {
 
         gameObjects.emplace(pointLight2.getId(), std::move(pointLight2));
 
-        for (auto& kv: gameObjects) {
-            auto& obj = kv.second;
-            obj.textureKey = { "sui-chan-guitar" };
-        }
-
         return gameObjects;
     }
 
 
-    void Scenes::loadCoordinateSystem(LveDevice& device, LveGameObject::Map& gameObjects) {
+    void Scenes::loadCoordinateSystem(LveDevice& device, LveGameObject::Map& gameObjects, TextureManager& textureManager) {
         std::shared_ptr<LveModel> originModel = LveModel::createModelFromFile(device, "models/sphere.obj");
         std::shared_ptr<LveModel> arrowModel = LveModel::createModelFromFile(device, "models/cone.obj");
+
+        std::optional<std::string> sui_chan_guitar = {"sui-chan-guitar"};
 
         auto origin = LveGameObject::createGameObject();
         origin.model = originModel;
         origin.transform.scale = {.05f, .05f, .05f};
+        origin.textureKey = sui_chan_guitar;
 
         auto xArrow = LveGameObject::createGameObject();
         xArrow.model = arrowModel;
         xArrow.transform.scale = {.05f, .05f, .05f};
         xArrow.transform.translation = {0.1f, 0.f, 0.f};
         xArrow.transform.rotation = {0.f, 0.f, -glm::half_pi<float>()};
+        xArrow.textureKey = sui_chan_guitar;
 
         auto yArrow = LveGameObject::createGameObject();
         yArrow.model = arrowModel;
         yArrow.transform.scale = {.05f, .05f, .05f};
         yArrow.transform.translation = {0.f, 0.1f, 0.f};
         yArrow.transform.rotation = {0.f, glm::half_pi<float>(), 0.f};
+        yArrow.textureKey = sui_chan_guitar;
 
         auto zArrow = LveGameObject::createGameObject();
         zArrow.model = arrowModel;
         zArrow.transform.scale = {.05f, .05f, .05f};
         zArrow.transform.translation = {0.f, 0.f, 0.1f};
         zArrow.transform.rotation = {glm::half_pi<float>(), 0.f, 0.f};
-
+        zArrow.textureKey = sui_chan_guitar;
 
         gameObjects.emplace(origin.getId(), std::move(origin));
         gameObjects.emplace(xArrow.getId(), std::move(xArrow));
