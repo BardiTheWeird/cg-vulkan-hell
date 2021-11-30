@@ -11,74 +11,42 @@ namespace lve {
     }
 
     TextureManager::~TextureManager() {
-        vkDestroyDescriptorPool(lveDevice.device(), textureDescriptorPool, nullptr);
-        vkDestroyDescriptorSetLayout(lveDevice.device(), textureDescriptorSetLayout, nullptr);
+        // vkDestroyDescriptorPool(lveDevice.device(), textureDescriptorPool, nullptr);
+        // vkDestroyDescriptorSetLayout(lveDevice.device(), getTextureDescriptorSetLayout(), nullptr);
 
         destroyTextureAllocations();
     }
 
     void TextureManager::createDescriptorSetLayout() {
-        VkDescriptorSetLayoutBinding texDescSetLayoutBinding{};
-        texDescSetLayoutBinding.binding = 0;
-        texDescSetLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        texDescSetLayoutBinding.descriptorCount = 1;
-        texDescSetLayoutBinding.pImmutableSamplers = nullptr;
-        texDescSetLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        auto descriptorSetLayout = LveDescriptorSetLayout::Builder(lveDevice)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+            .build();
 
-        VkDescriptorSetLayoutCreateInfo layoutInfo{};
-        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = 1;
-        layoutInfo.pBindings = &texDescSetLayoutBinding;
-
-        if (vkCreateDescriptorSetLayout(lveDevice.device(), &layoutInfo, nullptr, &textureDescriptorSetLayout) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create descriptor set layout!");
-        }
+        textureDescriptorSetLayout = std::move(descriptorSetLayout);
     }
 
     void TextureManager::createDescriptorPool() {
-        VkDescriptorPoolSize poolSize{};
-        poolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        poolSize.descriptorCount = 1;
-        
-        VkDescriptorPoolCreateInfo poolInfo{};
-        poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        poolInfo.poolSizeCount = 1;
-        poolInfo.pPoolSizes = &poolSize;
-        poolInfo.maxSets = 1000;
+        auto poolPtr = LveDescriptorPool::Builder(lveDevice)
+            .setMaxSets(100)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 100)
+            .build();
 
-        if (vkCreateDescriptorPool(lveDevice.device(), &poolInfo, nullptr, &textureDescriptorPool) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create descriptor pool!");
-        }
+        textureDescriptorPool = std::move(poolPtr);
     }
 
     VkDescriptorSet TextureManager::createDescriptorSet(VkImageView& imageView, VkSampler& imageSampler) {
-        VkDescriptorSetAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = textureDescriptorPool;
-        allocInfo.descriptorSetCount = 1;
-        allocInfo.pSetLayouts = &textureDescriptorSetLayout;
-
         VkDescriptorSet descriptorSet;
-        if (vkAllocateDescriptorSets(lveDevice.device(), &allocInfo, &descriptorSet) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate descriptor sets!");
-        }
+        (*textureDescriptorPool).allocateDescriptorSet(
+            getTextureDescriptorSetLayout(), descriptorSet);
 
         VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         imageInfo.imageView = imageView;
         imageInfo.sampler = imageSampler;
 
-        VkWriteDescriptorSet imageDescriptorWrite;
-        imageDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        imageDescriptorWrite.dstSet = descriptorSet;
-        imageDescriptorWrite.dstBinding = 0;
-        imageDescriptorWrite.dstArrayElement = 0;
-        imageDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        imageDescriptorWrite.descriptorCount = 1;
-        imageDescriptorWrite.pImageInfo = &imageInfo;
-        imageDescriptorWrite.pNext = nullptr;
-
-        vkUpdateDescriptorSets(lveDevice.device(), 1, &imageDescriptorWrite, 0, nullptr);
+        LveDescriptorWriter(*textureDescriptorSetLayout, *textureDescriptorPool)
+            .writeImage(0, &imageInfo)
+            .build(descriptorSet);
 
         return descriptorSet;
     }

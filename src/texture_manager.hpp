@@ -12,8 +12,6 @@ namespace lve {
     class TextureManager
     {
     public:
-        using Map = std::unordered_map<std::string, VkDescriptorSet>;
-
         TextureManager(const TextureManager&) = delete;
         TextureManager &operator=(const TextureManager&) = delete;
 
@@ -22,7 +20,7 @@ namespace lve {
 
         void addTexture(std::string filepath, std::string key);
 
-        const VkDescriptorSetLayout getTextureDescriptorSetLayout() const { return textureDescriptorSetLayout; }
+        const VkDescriptorSetLayout getTextureDescriptorSetLayout() const { return (*textureDescriptorSetLayout).getDescriptorSetLayout(); }
         const bool getTextureDescriptorSet(std::string key, VkDescriptorSet& descriptorSet) const {
             try {
                 descriptorSet = textureDescriptorSets.at(key);
@@ -34,6 +32,7 @@ namespace lve {
         }
 
     private:
+        using Map = std::unordered_map<std::string, VkDescriptorSet>;
         struct PerTextureAllocations {
             VkImage image;
             VkDeviceMemory imageMemory;
@@ -53,7 +52,7 @@ namespace lve {
 
         LveDevice& lveDevice;
 
-        VkDescriptorPool textureDescriptorPool;
-        VkDescriptorSetLayout textureDescriptorSetLayout;
+        std::unique_ptr<LveDescriptorPool> textureDescriptorPool;
+        std::unique_ptr<LveDescriptorSetLayout> textureDescriptorSetLayout;
     };
 }
