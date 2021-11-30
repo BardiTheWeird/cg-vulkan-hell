@@ -12,3 +12,9 @@
 .idea
 
 *.ipynb*
+
+build
+
+.env*
+
+external

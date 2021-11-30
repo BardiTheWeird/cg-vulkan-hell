@@ -96,18 +96,12 @@ namespace lve {
 
         VkImage image;
         VkDeviceMemory imageMemory;
-        std::cout << "1" << std::endl;
         lveDevice.createTextureImage(filepath, image, imageMemory);
-        std::cout << "2" << std::endl;
         VkImageView imageView = lveDevice.createTextureImageView(image);
-        std::cout << "3" << std::endl;
         VkSampler imageSampler = lveDevice.createTextureSampler(image, imageView);
-        std::cout << "4" << std::endl;
         VkDescriptorSet descriptorSet = createDescriptorSet(lveDevice, imageView, imageSampler);
-        std::cout << "5" << std::endl;
 
         Texture texture{lveDevice, image, imageMemory, imageView, imageSampler, descriptorSet};
-        std::cout << "6" << std::endl;
 
         return texture;
     }
@@ -130,21 +124,10 @@ namespace lve {
             return descriptorSetLayout;
         }
 
-        VkDescriptorSetLayoutBinding texDescSetLayoutBinding{};
-        texDescSetLayoutBinding.binding = 0;
-        texDescSetLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        texDescSetLayoutBinding.descriptorCount = 1;
-        texDescSetLayoutBinding.pImmutableSamplers = nullptr;
-        texDescSetLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-        VkDescriptorSetLayoutCreateInfo layoutInfo{};
-        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = 1;
-        layoutInfo.pBindings = &texDescSetLayoutBinding;
-
-        if (vkCreateDescriptorSetLayout(lveDevice.device(), &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create descriptor set layout!");
-        }
+        descriptorSetLayout = LveDescriptorSetLayout::Builder(lveDevice)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+            .build()
+            .get()->getDescriptorSetLayout();
 
         return descriptorSetLayout;
     }

@@ -56,8 +56,8 @@ namespace lve {
             configInfo.renderPass != VK_NULL_HANDLE &&
             "Cannot create graphics pipeline: no renderPass provided in configInfo");
         
-        auto vertCode = readFile(vertFilepath);
-        auto fragCode = readFile(fragFilepath);
+        auto vertCode = readFile(ENGINE_DIR + vertFilepath);
+        auto fragCode = readFile(ENGINE_DIR + fragFilepath);
 
         createShaderModule(vertCode, &vertShaderModule);
         createShaderModule(fragCode, &fragShaderModule);
