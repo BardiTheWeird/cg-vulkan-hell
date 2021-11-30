@@ -10,6 +10,13 @@ namespace lve {
         createDescriptorPool();
     }
 
+    TextureManager::~TextureManager() {
+        vkDestroyDescriptorPool(lveDevice.device(), textureDescriptorPool, nullptr);
+        vkDestroyDescriptorSetLayout(lveDevice.device(), textureDescriptorSetLayout, nullptr);
+
+        destroyTextureAllocations();
+    }
+
     void TextureManager::createDescriptorSetLayout() {
         VkDescriptorSetLayoutBinding texDescSetLayoutBinding{};
         texDescSetLayoutBinding.binding = 0;
@@ -84,6 +91,16 @@ namespace lve {
         allocations.imageSampler = lveDevice.createTextureSampler(allocations.image, allocations.imageView);
         VkDescriptorSet descriptorSet = createDescriptorSet(allocations.imageView, allocations.imageSampler);
 
+        textureAllocations.push_back(std::move(allocations));
         textureDescriptorSets.emplace(key, descriptorSet);
+    }
+
+    void TextureManager::destroyTextureAllocations() {
+        for (auto& allocations: textureAllocations) {
+            vkDestroySampler(lveDevice.device(), allocations.imageSampler, nullptr);
+            vkDestroyImageView(lveDevice.device(), allocations.imageView, nullptr);
+            vkDestroyImage(lveDevice.device(), allocations.image, nullptr);
+            vkFreeMemory(lveDevice.device(), allocations.imageMemory, nullptr);
+        }
     }
 }

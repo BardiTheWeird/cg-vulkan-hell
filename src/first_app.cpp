@@ -68,8 +68,6 @@ namespace lve
         };
         LveCamera camera{};
 
-        std::cout << "created a simple render system" << std::endl;
-
         auto viewerObject = LveGameObject::createGameObject();
         viewerObject.transform.translation = {0.f, 0.f, -1.f};
         KeyboardMovementController cameraController{};

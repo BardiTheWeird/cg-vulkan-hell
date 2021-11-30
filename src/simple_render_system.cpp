@@ -109,8 +109,6 @@ namespace lve
 
     void drawObject(LveGameObject& obj, FrameInfo& frameInfo, VkPipelineLayout pipelineLayout) {
 
-        std::cout << "trying to render" << std::endl;
-        
         SimplePushConstantData push{};
         push.modelMatrix = obj.transform.mat4();
         push.normalMatrix = obj.transform.normalMatrix();

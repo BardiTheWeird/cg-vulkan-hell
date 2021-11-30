@@ -18,6 +18,7 @@ namespace lve {
         TextureManager &operator=(const TextureManager&) = delete;
 
         TextureManager(LveDevice& device);
+        ~TextureManager();
 
         void addTexture(std::string filepath, std::string key);
 
@@ -42,6 +43,9 @@ namespace lve {
 
         void createDescriptorSetLayout();
         void createDescriptorPool();
+
+        void destroyTextureAllocations();
+
         VkDescriptorSet createDescriptorSet(VkImageView& imageView, VkSampler& imageSampler);
 
         std::vector<PerTextureAllocations> textureAllocations{};
