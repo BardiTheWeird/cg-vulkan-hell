@@ -2,10 +2,12 @@
 
 namespace lve {
 
-    LveGameObject::Map Scenes::loadTestScene1(LveDevice& device) {
+    LveGameObject::Map Scenes::loadTestScene1(LveDevice& device, TextureManager& textureManager) {
         LveGameObject::Map gameObjects{};
 
         loadCoordinateSystem(device, gameObjects);
+
+        textureManager.addTexture("sui-chan-guitar.jpeg", "sui-chan-guitar");
 
         std::shared_ptr<LveModel> whiteCubeInvertedNormals = LveModel::createModelFromFile(device, "models/cube-inverted-normals.obj");
         std::shared_ptr<LveModel> whiteCubeModel = LveModel::createModelFromFile(device, "models/cube.obj");
@@ -96,6 +98,11 @@ namespace lve {
         pointLight2.velocityAcceleration = std::make_shared<VelocityAccelerationComponent>(pointLight2VelocityAcceleration);
 
         gameObjects.emplace(pointLight2.getId(), std::move(pointLight2));
+
+        for (auto& kv: gameObjects) {
+            auto& obj = kv.second;
+            obj.textureKey = { "sui-chan-guitar" };
+        }
 
         return gameObjects;
     }

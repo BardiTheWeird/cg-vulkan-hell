@@ -21,12 +21,13 @@ namespace lve
     };
 
     SimpleRenderSystem::SimpleRenderSystem(
-        LveDevice& device, 
+        LveDevice& device,
+        TextureManager& _textureManager,
         VkRenderPass renderPass, 
         VkDescriptorSetLayout globalSetLayout, 
-        VkDescriptorSetLayout textureSetLayout) : lveDevice{device}
+        VkDescriptorSetLayout textureSetLayout) : lveDevice{device}, textureManager{_textureManager}
     {
-        createPipelineLayout(globalSetLayout, Texture::getDescriptorSetLayout(lveDevice));
+        createPipelineLayout(globalSetLayout, textureSetLayout);
         createPipeline(renderPass);
     }
 
@@ -148,19 +149,23 @@ namespace lve
                 continue;
             }
 
-            if (obj->texture == nullptr) {
-                coloredObjects.push_back(obj);
+            if (obj->textureKey.has_value()) {
+                texturedObjects.push_back(obj);
             }
             else {
-                texturedObjects.push_back(obj);
+                coloredObjects.push_back(obj);
             }
         }
 
         // draw objects with texture
         texturedLvePipeline->bind(frameInfo.commandBuffer);
         for (auto obj: texturedObjects) {
-            
-            auto descriptorSet = obj->texture->getDescriptorSet();
+            std::string textureKey = obj->textureKey.value();
+            VkDescriptorSet descriptorSet;
+            if (!textureManager.getTextureDescriptorSet(textureKey, descriptorSet)) {
+                throw std::runtime_error("Couldn't find a texture with key " + textureKey);
+            }
+
             vkCmdBindDescriptorSets(
                 frameInfo.commandBuffer,
                 VK_PIPELINE_BIND_POINT_GRAPHICS,

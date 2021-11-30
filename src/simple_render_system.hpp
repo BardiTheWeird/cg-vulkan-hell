@@ -6,6 +6,7 @@
 #include "lve_model.hpp"
 #include "lve_game_object.hpp"
 #include "lve_frame_info.hpp"
+#include "texture_manager.hpp"
 
 // std
 #include <memory>
@@ -16,7 +17,8 @@ namespace lve {
     class SimpleRenderSystem {
     public:
         SimpleRenderSystem(
-            LveDevice& device, 
+            LveDevice& device,
+            TextureManager& _textureManager, 
             VkRenderPass renderPass, 
             VkDescriptorSetLayout globalSetLayout, 
             VkDescriptorSetLayout textureSetLayout);
@@ -32,6 +34,7 @@ namespace lve {
         void createPipeline(VkRenderPass& renderPass);
 
         LveDevice& lveDevice;
+        TextureManager& textureManager;
 
         std::unique_ptr<LvePipeline> coloredLvePipeline;
         VkPipelineLayout coloredPipelineLayout;

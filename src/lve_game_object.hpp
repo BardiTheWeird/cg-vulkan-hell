@@ -5,11 +5,12 @@
 #include "components/transform_component.hpp"
 #include "components/velocity_acceleration_component.hpp"
 #include "components/circular_movement_component.hpp"
-#include "texture.hpp"
 
 // std
 #include <memory>
 #include <unordered_map>
+#include <string>
+#include <optional>
 
 namespace lve
 {
@@ -33,7 +34,7 @@ namespace lve
 
         bool isVisible{true};
         std::shared_ptr<LveModel> model{};
-        std::shared_ptr<Texture> texture = nullptr;
+        std::optional<std::string> textureKey = std::nullopt;
 
         // components
         // required

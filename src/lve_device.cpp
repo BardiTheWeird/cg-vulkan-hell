@@ -9,6 +9,10 @@
 #include <set>
 #include <unordered_set>
 
+#ifndef TEXTURE_DIR
+#define TEXTURE_DIR "../textures/"
+#endif
+
 namespace lve {
 
 // local callback functions
@@ -590,7 +594,7 @@ void LveDevice::createTextureImage(std::string filepath, VkImage& textureImage, 
   int texWidth, texHeight, texChannels;
 
   // loading the image
-  stbi_uc* pixels = stbi_load(filepath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+  stbi_uc* pixels = stbi_load((TEXTURE_DIR + filepath).c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 
   if (!pixels) {
       throw std::runtime_error("Failed to load texture file " + filepath);

@@ -6,6 +6,7 @@
 #include "lve_game_object.hpp"
 #include "lve_renderer.hpp"
 #include "lve_descriptors.hpp"
+#include "texture_manager.hpp"
 
 #define MAX_LIGHT_SOURCES 128
 
@@ -51,6 +52,7 @@ namespace lve {
         LveWindow lveWindow{WIDTH, HEIGHT, "Hello, Vulkan!"};
         LveDevice lveDevice{lveWindow};
         LveRenderer lveRenderer{lveWindow, lveDevice};
+        TextureManager textureManager{lveDevice};
 
         std::unique_ptr<LveDescriptorPool> globalPool;
         std::unique_ptr<LveDescriptorPool> textureDescriptorPool;

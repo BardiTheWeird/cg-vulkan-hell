@@ -29,8 +29,6 @@ namespace lve
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, LveSwapChain::MAX_FRAMES_IN_FLIGHT)
             .build();
 
-        Texture::getDescriptorSetLayout(lveDevice);
-
         loadGameObjects();
     }
 
@@ -62,27 +60,15 @@ namespace lve
 
 
         SimpleRenderSystem simpleRenderSystem{
-            lveDevice, 
+            lveDevice,
+            textureManager, 
             lveRenderer.getSwapChainRenderPass(), 
             globalSetLayout->getDescriptorSetLayout(),
-            Texture::getDescriptorSetLayout(lveDevice)
+            textureManager.getTextureDescriptorSetLayout()
         };
         LveCamera camera{};
 
         std::cout << "created a simple render system" << std::endl;
-
-        std::cout << "initialized a texture" << std::endl;
-
-        auto shared_ptr_to_sui = std::make_shared<Texture>(std::move(Texture
-        ::createFromFile(
-            lveDevice,
-            "textures/sui-chan.jpeg"
-        )));
-
-        for (std::pair<const lve::LveGameObject::id_t, lve::LveGameObject>& kv: gameObjects) {
-            LveGameObject& obj = kv.second;
-            obj.texture = shared_ptr_to_sui;
-        }
 
         auto viewerObject = LveGameObject::createGameObject();
         viewerObject.transform.translation = {0.f, 0.f, -1.f};
@@ -143,7 +129,7 @@ namespace lve
     }
 
     void FirstApp::loadGameObjects() {
-        gameObjects = std::move(Scenes::loadTestScene1(lveDevice));
+        gameObjects = std::move(Scenes::loadTestScene1(lveDevice, textureManager));
     }
 
     void FirstApp::getLightSources(GlobalUbo& ubo) {
