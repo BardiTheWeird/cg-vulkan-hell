@@ -43,8 +43,8 @@ std::unique_ptr<LveModel> LveModel::createModelFromFile(
 void LveModel::createVertexBuffers(const std::vector<Vertex> &vertices) {
   vertexCount = static_cast<uint32_t>(vertices.size());
   assert(vertexCount >= 3 && "Vertex count must be at least 3");
-  VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
   uint32_t vertexSize = sizeof(vertices[0]);
+  VkDeviceSize bufferSize = vertexSize * vertexCount;
 
   LveBuffer stagingBuffer{
       lveDevice,
@@ -179,7 +179,7 @@ void LveModel::Data::loadModel(const std::string &filepath) {
       if (index.texcoord_index >= 0) {
         vertex.uv = {
             attrib.texcoords[2 * index.texcoord_index + 0],
-            attrib.texcoords[2 * index.texcoord_index + 1],
+            1 - attrib.texcoords[2 * index.texcoord_index + 1],
         };
       }
 

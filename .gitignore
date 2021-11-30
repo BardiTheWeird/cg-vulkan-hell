@@ -8,3 +8,7 @@
 .vscode
 
 *.log
+
+.idea
+
+*.ipynb*

@@ -70,6 +70,11 @@ class LveDevice {
       VkImage &image,
       VkDeviceMemory &imageMemory);
 
+  void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+  void createTextureImage(std::string filepath, VkImage& image, VkDeviceMemory& imageMemory);
+  VkImageView createTextureImageView(VkImage textureImage);
+  VkSampler createTextureSampler(VkImage textureImage, VkImageView textureImageView);
+
   VkPhysicalDeviceProperties properties;
 
  private:
@@ -78,7 +83,7 @@ class LveDevice {
   void createSurface();
   void pickPhysicalDevice();
   void createLogicalDevice();
-  void createCommandPool();
+  void createCommandPool(VkCommandPool& commandPool);
 
   // helper functions
   bool isDeviceSuitable(VkPhysicalDevice device);

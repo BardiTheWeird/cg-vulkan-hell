@@ -1,6 +1,7 @@
 TINYOBJ_PATH=/home/bardi/imma-coder/cpp/libs/tinyobjectloader
+STB_PATH=/home/bardi/imma-coder/cpp/libs/stb
 
-CFLAGS = -std=c++17 -O2 -I. -I${VULKAN_SDK_PATH}/include -I${TINYOBJ_PATH} -Icomponents
+CFLAGS = -std=c++17 -O2 -I. -I${VULKAN_SDK_PATH}/include -I${TINYOBJ_PATH} -I${STB_PATH} -Icomponents
 LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 
 vertSources = $(shell find shaders -type f -name "*.vert")

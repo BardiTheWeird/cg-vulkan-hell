@@ -1,8 +1,13 @@
+#include "first_app.hpp"
+
+// std
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 
-#include "first_app.hpp"
+// libs
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 void ErrorCallback(int, const char* err_str)
 {
