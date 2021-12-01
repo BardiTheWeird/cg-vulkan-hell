@@ -41,9 +41,9 @@ namespace lve
         TransformComponent transform{};
 
         // optional
-        std::shared_ptr<LightSource> lightSource = nullptr;
-        std::shared_ptr<VelocityAccelerationComponent> velocityAcceleration = nullptr;
-        std::shared_ptr<CircularMovementComponent> circularMovement = nullptr;
+        std::optional<LightSource> lightSource = std::nullopt;
+        std::optional<VelocityAccelerationComponent> velocityAcceleration = std::nullopt;
+        std::optional<CircularMovementComponent> circularMovement = std::nullopt;
 
     private:
         LveGameObject(id_t objId) : id{objId} {};

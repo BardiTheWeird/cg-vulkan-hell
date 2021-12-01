@@ -142,7 +142,7 @@ namespace lve
         for (auto& kv : gameObjects) {
             auto& obj = kv.second;
             auto lightSource = obj.lightSource;
-            if (lightSource == nullptr || lightSource->turnedOn == false) {
+            if (!(lightSource.has_value() && lightSource.value().turnedOn)) {
                 continue;
             }
 

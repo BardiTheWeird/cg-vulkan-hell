@@ -35,24 +35,24 @@ namespace lve {
     // LightSource private
     LveGameObject LightSource::createGameObjectWithLightSource(LightSource source) {
         auto gameObject = LveGameObject::createGameObject();
-        gameObject.lightSource = std::make_shared<LightSource>(std::move(source));
+        gameObject.lightSource = {std::move(source)};
         return gameObject;
     }
 
     // LightSourceDTO
 
     LightSourceDTO LightSourceDTO::fromGameObject(LveGameObject& obj) {
-        if (obj.lightSource == nullptr) {
+        if (!obj.lightSource.has_value()) {
             throw std::runtime_error("can't create LightSourceDTO form LveGameObject without a LightSource");
         }
 
-        auto lightSource = obj.lightSource;
+        auto lightSource = obj.lightSource.value();
 
         LightSourceDTO dto{};
-        dto.parameters.kind = lightSource->kind;
-        dto.color = lightSource->color;
+        dto.parameters.kind = lightSource.kind;
+        dto.color = lightSource.color;
 
-        switch (lightSource->kind)
+        switch (lightSource.kind)
         {
         case LightSourceKind::DirectionalLight:
             dto.value1 = {obj.transform.rotation, 0.f};

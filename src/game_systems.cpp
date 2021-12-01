@@ -13,7 +13,7 @@ namespace lve {
 
         for (auto& kv : gameSystemInfo.gameObjects) {
             auto& obj = kv.second;
-            if (obj.velocityAcceleration == nullptr)
+            if (!obj.velocityAcceleration.has_value())
                 continue;
 
             auto velocityAcceleration = obj.velocityAcceleration;
@@ -28,7 +28,7 @@ namespace lve {
     void GameSystems::moveCircle(GameSystemInfo& gameSystemInfo) {
         for (auto& kv : gameSystemInfo.gameObjects) {
             auto& obj = kv.second;
-            if (obj.circularMovement == nullptr)
+            if (!obj.circularMovement.has_value())
                 continue;
 
             auto circ = obj.circularMovement;

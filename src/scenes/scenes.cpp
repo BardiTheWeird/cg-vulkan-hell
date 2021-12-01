@@ -75,7 +75,7 @@ namespace lve {
         auto directionalLightGameObject = LightSource::createDirectional(glm::normalize(glm::vec3{1.f, -3.f, -1.f}));
         // VelocityAccelerationComponent directionalLightVelocityAcceleration{};
         // directionalLightVelocityAcceleration.rotationVelocity = {.5f, 0.f, 1.f};
-        // directionalLightGameObject.velocityAcceleration = std::make_shared<VelocityAccelerationComponent>(directionalLightVelocityAcceleration);
+        // directionalLightGameObject.velocityAcceleration = {directionalLightVelocityAcceleration};
 
         // gameObjects.emplace(directionalLightGameObject.getId(), std::move(directionalLightGameObject));
 
@@ -91,12 +91,12 @@ namespace lve {
         pointLight1CircularMovement.center = {0.f, 0.f, 3.f};
         pointLight1CircularMovement.speed = 1.f;
         pointLight1CircularMovement.rotation = glm::normalize(glm::vec3{0.f, 0.f, 1.f});
-        pointLight1.circularMovement = std::make_shared<CircularMovementComponent>(pointLight1CircularMovement);        
+        pointLight1.circularMovement = {pointLight1CircularMovement};        
 
         VelocityAccelerationComponent pointLight1VelocityAcceleration{};
         pointLight1VelocityAcceleration.rotationVelocity = {.2f, .3f, .5f};
 
-        pointLight1.velocityAcceleration = std::make_shared<VelocityAccelerationComponent>(pointLight1VelocityAcceleration);
+        pointLight1.velocityAcceleration = {pointLight1VelocityAcceleration};
 
         gameObjects.emplace(pointLight1.getId(), std::move(pointLight1));
 
@@ -112,12 +112,12 @@ namespace lve {
         pointLight2CircularMovement.center = {0.f, 3.f, 3.f};
         pointLight2CircularMovement.speed = .8f;
         pointLight2CircularMovement.rotation = glm::normalize(glm::vec3{0.f, 1.f, 0.f});
-        pointLight2.circularMovement = std::make_shared<CircularMovementComponent>(pointLight2CircularMovement);        
+        pointLight2.circularMovement = {pointLight2CircularMovement};        
 
         VelocityAccelerationComponent pointLight2VelocityAcceleration{};
         pointLight2VelocityAcceleration.rotationVelocity = {.2f, .1f, .3f};
 
-        pointLight2.velocityAcceleration = std::make_shared<VelocityAccelerationComponent>(pointLight2VelocityAcceleration);
+        pointLight2.velocityAcceleration = {pointLight2VelocityAcceleration};
 
         gameObjects.emplace(pointLight2.getId(), std::move(pointLight2));
 
