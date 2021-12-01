@@ -95,13 +95,6 @@ namespace lve
             float aspect = lveRenderer.getAspectRatio();
             camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 500.f);
 
-            GameSystemInfo gameSystemInfo {
-                frameTime,
-                camera,
-                gameObjects,
-            };
-            GameSystems::executeAll(gameSystemInfo);
-
             if (auto commandBuffer = lveRenderer.beginFrame()) {
                 int frameIndex = lveRenderer.getFrameIndex();
                 FrameInfo frameInfo{
@@ -112,6 +105,8 @@ namespace lve
                     globalDescriptorSets[frameIndex],
                     gameObjects
                 };
+
+                GameSystems::executeAll(frameInfo);
 
                 // update
                 GlobalUbo ubo{};

@@ -8,12 +8,6 @@
 
 namespace lve {
 
-    struct GameSystemInfo {
-        float frameTime;
-        LveCamera& camera;
-        LveGameObject::Map& gameObjects;
-    };
-
     struct FrameInfo {
         int frameIndex;
         float frameTime;

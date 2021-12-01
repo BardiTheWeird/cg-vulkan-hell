@@ -8,8 +8,8 @@
 namespace lve {
 
     struct GameSystems {
-        static void executeAll(GameSystemInfo& gameSystemInfo);
-        static void move(GameSystemInfo& gameSystemInfo);
-        static void moveCircle(GameSystemInfo& gameSystemInfo);
+        static void executeAll(FrameInfo& frameInfo);
+        static void move(FrameInfo& frameInfo);
+        static void moveCircle(FrameInfo& frameInfo);
     };
 }
