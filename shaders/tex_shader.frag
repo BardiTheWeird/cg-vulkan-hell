@@ -74,4 +74,5 @@ void main() {
 
     vec3 color = texture(tex1, texCoord).xyz;
     outColor = vec4((diffuseLight + ambientLight) * color, 1.0);
+    // outColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

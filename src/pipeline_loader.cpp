@@ -48,12 +48,12 @@ namespace lve {
 
 
         pipelineManager.addPipeline(constants::pipeline_keys::colored_plain, coloredPlainPipelineLayout,
-            "col_shader.vert", "col_shader.frag");
+            "col_shader.vert.spv", "col_shader.frag.spv");
         // pipelineManager.addPipeline(constants::pipelines::colored_pbr, coloredPbrPipelineLayout,
-            // "col_pbr_shader.vert", "col_pbr_shader.frag");
+            // "col_pbr_shader.vert.spv", "col_pbr_shader.frag.spv");
         pipelineManager.addPipeline(constants::pipeline_keys::textured_plain, texturedPlainPipelineLayout,
-            "tex_shader.vert", "tex_shader.frag");
+            "tex_shader.vert.spv", "tex_shader.frag.spv");
         // pipelineManager.addPipeline(constants::pipelines::textured_pbr, texturedPbrPipelineLayout,
-            // "tex_pbr_shader.vert", "tex_pbr_shader.frag");
+            // "tex_pbr_shader.vert.spv", "tex_pbr_shader.frag.spv");
     }
 }

@@ -70,4 +70,5 @@ void main() {
 
     vec3 ambientLight = ubo.ambientColor.xyz * ubo.ambientColor.w;
     outColor = vec4((diffuseLight + ambientLight) * fragColor, 1.0);
+    // outColor = vec4(1.0,1.0,1.0,1.0);
 }

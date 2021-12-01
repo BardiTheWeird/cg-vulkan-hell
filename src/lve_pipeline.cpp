@@ -5,6 +5,10 @@
 #include <stdexcept>
 #include <cassert>
 
+#ifndef SHADER_DIR
+#define SHADER_DIR "../shaders/"
+#endif
+
 namespace lve {
     LvePipeline::LvePipeline(
                 LveDevice& device, 
@@ -56,8 +60,8 @@ namespace lve {
             configInfo.renderPass != VK_NULL_HANDLE &&
             "Cannot create graphics pipeline: no renderPass provided in configInfo");
         
-        auto vertCode = readFile(ENGINE_DIR + vertFilepath);
-        auto fragCode = readFile(ENGINE_DIR + fragFilepath);
+        auto vertCode = readFile(SHADER_DIR + vertFilepath);
+        auto fragCode = readFile(SHADER_DIR + fragFilepath);
 
         createShaderModule(vertCode, &vertShaderModule);
         createShaderModule(fragCode, &fragShaderModule);

@@ -1,9 +1,5 @@
 #include "pipeline_manager.hpp"
 
-#ifndef SHADER_DIR
-#define SHADER_DIR "../shaders/"
-#endif
-
 namespace lve {
 
     PipelineManager::PipelineManager(LveDevice& device, VkRenderPass _renderPass) 
@@ -24,8 +20,8 @@ namespace lve {
 
         info.pipeline = std::make_shared<LvePipeline>(
             lveDevice,
-            "shaders/col_shader.vert.spv",
-            "shaders/col_shader.frag.spv",
+            vertShaderPath,
+            fragShaderPath,
             pipelineConfig);
 
         pipelines.insert_or_assign(key, std::move(info));

@@ -25,15 +25,17 @@ namespace lve
                 : lveDevice{device}, 
                 textureManager{_textureManager}, 
                 materialManager{_materialManager},
-                pipelineManager{_pipelineManager} {}
+                pipelineManager{_pipelineManager} 
+            {
+                using namespace constants::pipeline_keys;
+
+                coloredPlainPipelineInfo = pipelineManager.getPipeline(colored_plain).value();
+                // coloredPbrPipelineInfo = pipelineManager.getPipeline(colored_pbr).value();
+                texturedPlainPipelineInfo = pipelineManager.getPipeline(textured_plain).value();
+                // texturedPbrPipelineInfo = pipelineManager.getPipeline(textured_pbr).value();
+            }
 
     SimpleRenderSystem::~SimpleRenderSystem() {
-        using namespace constants::pipeline_keys;
-
-        coloredPlainPipelineInfo = pipelineManager.getPipeline(colored_plain).value();
-        // coloredPbrPipelineInfo = pipelineManager.getPipeline(colored_pbr).value();
-        texturedPlainPipelineInfo = pipelineManager.getPipeline(textured_plain).value();
-        // texturedPbrPipelineInfo = pipelineManager.getPipeline(textured_pbr).value();
     }
 
     void drawObject(LveGameObject& obj, FrameInfo& frameInfo, VkPipelineLayout pipelineLayout) {
