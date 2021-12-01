@@ -40,20 +40,21 @@ namespace lve {
         std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
         std::vector<VkDescriptorSetLayout> descriptorSetLayouts2{globalSetLayout, textureSetLayout};
         std::vector<VkDescriptorSetLayout> descriptorSetLayouts3{globalSetLayout, textureSetLayout, materialSetLayout};
+        std::vector<VkDescriptorSetLayout> descriptorSetLayouts4{globalSetLayout, materialSetLayout};
 
         VkPipelineLayout coloredPlainPipelineLayout = createPipelineLayout(descriptorSetLayouts);
-        VkPipelineLayout coloredPbrPipelineLayout = createPipelineLayout(descriptorSetLayouts3);
+        VkPipelineLayout coloredPbrPipelineLayout = createPipelineLayout(descriptorSetLayouts4);
         VkPipelineLayout texturedPlainPipelineLayout = createPipelineLayout(descriptorSetLayouts2);
         VkPipelineLayout texturedPbrPipelineLayout = createPipelineLayout(descriptorSetLayouts3);
 
 
         pipelineManager.addPipeline(constants::pipeline_keys::colored_plain, coloredPlainPipelineLayout,
-            "col_shader.vert.spv", "col_shader.frag.spv");
-        // pipelineManager.addPipeline(constants::pipelines::colored_pbr, coloredPbrPipelineLayout,
-            // "col_pbr_shader.vert.spv", "col_pbr_shader.frag.spv");
+            "shader.vert.spv", "col_shader.frag.spv");
+        pipelineManager.addPipeline(constants::pipeline_keys::colored_pbr, coloredPbrPipelineLayout,
+            "shader.vert.spv", "col_pbr_shader.frag.spv");
         pipelineManager.addPipeline(constants::pipeline_keys::textured_plain, texturedPlainPipelineLayout,
-            "tex_shader.vert.spv", "tex_shader.frag.spv");
-        // pipelineManager.addPipeline(constants::pipelines::textured_pbr, texturedPbrPipelineLayout,
-            // "tex_pbr_shader.vert.spv", "tex_pbr_shader.frag.spv");
+            "shader.vert.spv", "tex_shader.frag.spv");
+        pipelineManager.addPipeline(constants::pipeline_keys::textured_pbr, texturedPbrPipelineLayout,
+            "shader.vert.spv", "tex_pbr_shader.frag.spv");
     }
 }

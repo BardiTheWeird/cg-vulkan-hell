@@ -116,6 +116,7 @@ namespace lve
                 // update
                 GlobalUbo ubo{};
                 ubo.projectionView = camera.getProjectionMatrix() * camera.getViewMatrix();
+                ubo.cameraPosition = {viewerObject.transform.translation, 0.f};
 
                 getLightSources(ubo);
 
@@ -134,7 +135,7 @@ namespace lve
     }
 
     void FirstApp::loadGameObjects() {
-        gameObjects = std::move(Scenes::loadTestScene1(lveDevice, textureManager));
+        gameObjects = std::move(Scenes::loadTestScene1(lveDevice, textureManager, materialManager));
     }
 
     void FirstApp::getLightSources(GlobalUbo& ubo) {

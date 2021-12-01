@@ -35,6 +35,7 @@ struct GlobalUboParameters {
 layout (set = 0, binding = 0) uniform GlobalUbo {
     mat4 projectionViewMatrix;
     vec4 ambientColor;
+    vec4 cameraPosition;
     GlobalUboParameters parameters;
     LightSource lightSources[MAX_LIGHT_SOURCES];
 } ubo;
@@ -74,5 +75,4 @@ void main() {
 
     vec3 color = texture(tex1, texCoord).xyz;
     outColor = vec4((diffuseLight + ambientLight) * color, 1.0);
-    // outColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

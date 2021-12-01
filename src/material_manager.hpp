@@ -26,6 +26,7 @@ namespace lve {
         ~MaterialManager();
 
         const VkDescriptorSetLayout getDescriptorSetLayout() const { return (*materialDescriptorSetLayout).getDescriptorSetLayout(); }
+        const VkDescriptorSet getDescriptorSet(id_t id) const { return perMaterialAllocations.at(id).descriptorSet; }
 
         id_t allocateMaterial();
         void updateMaterial(MaterialComponent& materialComponent);
@@ -40,7 +41,7 @@ namespace lve {
                 return MaterialUbo {
                     {component.albedoMesh, component.roughness},
                     {component.baseReflectance, component.metallicCoefficient},
-                    {component.emissivityMesh, 0.f}
+                    {component.emissivityMesh}
                 };
             }
         };

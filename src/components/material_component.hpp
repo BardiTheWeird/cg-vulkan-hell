@@ -11,13 +11,13 @@ namespace lve {
     struct MaterialComponent {
         using id_t = unsigned int;
 
-        bool updatedThisFrame;
-
         id_t material_id;
-        glm::vec3 albedoMesh;
-        float roughness;
-        glm::vec3 emissivityMesh;
-        glm::vec3 baseReflectance;
-        float metallicCoefficient;
+        glm::vec3 albedoMesh{2.0};
+        float roughness{0.1};
+        glm::vec4 emissivityMesh{0.0};
+        glm::vec3 baseReflectance{0.3};
+        float metallicCoefficient{0.0};
+
+        bool updatedThisFrame;
     };
 }

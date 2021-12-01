@@ -3,6 +3,6 @@
 mkdir -p build
 cd build
 cmake -S ../ -B .
-make && make Shaders
+make && make Shaders && \
 ./LveEngine
 cd ../

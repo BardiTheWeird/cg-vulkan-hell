@@ -37,8 +37,8 @@ namespace lve {
         PipelineManager& pipelineManager;
 
         PipelineInfo coloredPlainPipelineInfo;
-        // PipelineInfo coloredPbrPipelineInfo;
+        PipelineInfo coloredPbrPipelineInfo;
         PipelineInfo texturedPlainPipelineInfo;
-        // PipelineInfo texturedPbrPipelineInfo;
+        PipelineInfo texturedPbrPipelineInfo;
     };
 }

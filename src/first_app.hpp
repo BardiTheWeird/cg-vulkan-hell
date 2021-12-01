@@ -27,7 +27,8 @@ namespace lve {
 
     struct GlobalUbo {
         glm::mat4 projectionView{1.f};
-        glm::vec4 ambientColor{1.f, 1.f, 1.f, .02f};
+        glm::vec4 ambientColor{1.f, 1.f, 1.f, .001f};
+        glm::vec4 cameraPosition{};
         GlobalUboParameters parameters;
         LightSourceDTO lightSources[MAX_LIGHT_SOURCES];
     };

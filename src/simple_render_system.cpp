@@ -30,9 +30,9 @@ namespace lve
                 using namespace constants::pipeline_keys;
 
                 coloredPlainPipelineInfo = pipelineManager.getPipeline(colored_plain).value();
-                // coloredPbrPipelineInfo = pipelineManager.getPipeline(colored_pbr).value();
+                coloredPbrPipelineInfo = pipelineManager.getPipeline(colored_pbr).value();
                 texturedPlainPipelineInfo = pipelineManager.getPipeline(textured_plain).value();
-                // texturedPbrPipelineInfo = pipelineManager.getPipeline(textured_pbr).value();
+                texturedPbrPipelineInfo = pipelineManager.getPipeline(textured_pbr).value();
             }
 
     SimpleRenderSystem::~SimpleRenderSystem() {
@@ -71,9 +71,9 @@ namespace lve
 
         // separate objects with and without textures
         std::vector<lve::LveGameObject*> coloredPlainObjects{};
-        // std::vector<lve::LveGameObject*> coloredPbrObjects{};
+        std::vector<lve::LveGameObject*> coloredPbrObjects{};
         std::vector<lve::LveGameObject*> texturedPlainObjects{};
-        // std::vector<lve::LveGameObject*> texturedPbrObjects{};
+        std::vector<lve::LveGameObject*> texturedPbrObjects{};
 
         for (auto& kv: frameInfo.gameObjects) {
             auto obj = &kv.second;
@@ -82,10 +82,16 @@ namespace lve
             }
 
             if (obj->textureKey.has_value()) {
-                texturedPlainObjects.push_back(obj);
+                if (obj->material.has_value())
+                    texturedPbrObjects.push_back(obj);
+                else
+                    texturedPlainObjects.push_back(obj);
             }
             else {
-                coloredPlainObjects.push_back(obj);
+                if (obj->material.has_value())
+                    coloredPbrObjects.push_back(obj);
+                else
+                    coloredPlainObjects.push_back(obj);
             }
         }
 
@@ -98,6 +104,28 @@ namespace lve
             for (auto obj: coloredPlainObjects) {
                 drawObject(*obj, frameInfo, pipelineInfo.layout);
             }    
+        }
+
+        // draw colored pbr objects
+        if (coloredPbrObjects.size() > 0) {
+            pipelineInfo = coloredPbrPipelineInfo;
+            pipelineInfo.pipeline->bind(frameInfo.commandBuffer);
+            for (auto obj: coloredPbrObjects) {
+                auto materialDescriptorSet = materialManager.getDescriptorSet(obj->material.value().material_id);
+
+                vkCmdBindDescriptorSets(
+                    frameInfo.commandBuffer,
+                    VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    pipelineInfo.layout,
+                    1,
+                    1,
+                    &materialDescriptorSet,
+                    0,
+                    nullptr
+                );
+
+                drawObject(*obj, frameInfo, pipelineInfo.layout);
+            }
         }
 
         if (texturedPlainObjects.size() > 0) {
@@ -118,6 +146,45 @@ namespace lve
                     1,
                     1,
                     &descriptorSet,
+                    0,
+                    nullptr
+                );
+
+                drawObject(*obj, frameInfo, pipelineInfo.layout);
+            }
+        }
+
+        if (texturedPbrObjects.size() > 0) {
+            // draw objects with texture
+            pipelineInfo = texturedPbrPipelineInfo;
+            pipelineInfo.pipeline->bind(frameInfo.commandBuffer);
+            for (auto obj: texturedPbrObjects) {
+                std::string textureKey = obj->textureKey.value();
+                VkDescriptorSet descriptorSet;
+                if (!textureManager.getTextureDescriptorSet(textureKey, descriptorSet)) {
+                    throw std::runtime_error("Couldn't find a texture with key " + textureKey);
+                }
+
+                vkCmdBindDescriptorSets(
+                    frameInfo.commandBuffer,
+                    VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    pipelineInfo.layout,
+                    1,
+                    1,
+                    &descriptorSet,
+                    0,
+                    nullptr
+                );
+
+                auto materialDescriptorSet = materialManager.getDescriptorSet(obj->material.value().material_id);
+
+                vkCmdBindDescriptorSets(
+                    frameInfo.commandBuffer,
+                    VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    pipelineInfo.layout,
+                    2,
+                    1,
+                    &materialDescriptorSet,
                     0,
                     nullptr
                 );

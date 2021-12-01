@@ -5,6 +5,7 @@
 #include "components/transform_component.hpp"
 #include "components/velocity_acceleration_component.hpp"
 #include "components/circular_movement_component.hpp"
+#include "components/material_component.hpp"
 
 // std
 #include <memory>
@@ -35,6 +36,7 @@ namespace lve
         bool isVisible{true};
         std::shared_ptr<LveModel> model{};
         std::optional<std::string> textureKey = std::nullopt;
+        std::optional<MaterialComponent> material = std::nullopt;
 
         // components
         // required
