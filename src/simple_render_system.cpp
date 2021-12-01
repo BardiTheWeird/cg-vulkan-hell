@@ -1,4 +1,6 @@
 #include "simple_render_system.hpp"
+#include "push_constants.hpp"
+#include "constants.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -15,96 +17,23 @@
 
 namespace lve
 {
-    struct SimplePushConstantData {
-        glm::mat4 modelMatrix{1.f};
-        glm::mat4 normalMatrix{1.f};
-    };
-
     SimpleRenderSystem::SimpleRenderSystem(
-        LveDevice& device,
-        TextureManager& _textureManager,
-        VkRenderPass renderPass, 
-        VkDescriptorSetLayout globalSetLayout, 
-        VkDescriptorSetLayout textureSetLayout) : lveDevice{device}, textureManager{_textureManager}
-    {
-        createPipelineLayout(globalSetLayout, textureSetLayout);
-        createPipeline(renderPass);
-    }
+            LveDevice& device,
+            TextureManager& _textureManager, 
+            MaterialManager& _materialManager,
+            PipelineManager& _pipelineManager) 
+                : lveDevice{device}, 
+                textureManager{_textureManager}, 
+                materialManager{_materialManager},
+                pipelineManager{_pipelineManager} {}
 
-    SimpleRenderSystem::~SimpleRenderSystem()
-    {
-        vkDestroyPipelineLayout(lveDevice.device(), coloredPipelineLayout, nullptr);
-        vkDestroyPipelineLayout(lveDevice.device(), texturedPipelineLayout, nullptr);
-    }
+    SimpleRenderSystem::~SimpleRenderSystem() {
+        using namespace constants::pipeline_keys;
 
-    void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout)
-    {
-        // colored pipeline layout
-        VkPushConstantRange pushConstantRange{};
-        pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-        pushConstantRange.offset = 0;
-        pushConstantRange.size = sizeof(SimplePushConstantData);
-
-        std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
-
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
-        pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
-        pipelineLayoutInfo.pushConstantRangeCount = 1;
-        pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-
-        if (vkCreatePipelineLayout(lveDevice.device(), &pipelineLayoutInfo, nullptr, &coloredPipelineLayout) != VK_SUCCESS)
-        {
-            throw std::runtime_error("Failed to create coloredPipelineLayout");
-        }
-
-        // textured pipeline layout
-        // VkPushConstantRange pushConstantRange{};
-        // pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-        // pushConstantRange.offset = 0;
-        // pushConstantRange.size = sizeof(SimplePushConstantData);
-
-        std::vector<VkDescriptorSetLayout> descriptorSetLayouts2{globalSetLayout, textureSetLayout};
-
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo2{};
-        pipelineLayoutInfo2.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo2.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts2.size());
-        pipelineLayoutInfo2.pSetLayouts = descriptorSetLayouts2.data();
-        pipelineLayoutInfo2.pushConstantRangeCount = 1;
-        pipelineLayoutInfo2.pPushConstantRanges = &pushConstantRange;
-
-        if (vkCreatePipelineLayout(lveDevice.device(), &pipelineLayoutInfo2, nullptr, &texturedPipelineLayout) != VK_SUCCESS)
-        {
-            throw std::runtime_error("Failed to create pipelineLayout");
-        }
-    }
-
-    void SimpleRenderSystem::createPipeline(VkRenderPass& renderPass)
-    {
-        assert(coloredPipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
-
-        PipelineConfigInfo pipelineConfig{};
-        LvePipeline::defaultPipelineConfigInfo(pipelineConfig);
-        pipelineConfig.renderPass = renderPass;
-        pipelineConfig.pipelineLayout = coloredPipelineLayout;
-
-        coloredLvePipeline = std::make_unique<LvePipeline>(
-            lveDevice,
-            "shaders/col_shader.vert.spv",
-            "shaders/col_shader.frag.spv",
-            pipelineConfig);
-        
-        PipelineConfigInfo pipelineConfig2{};
-        LvePipeline::defaultPipelineConfigInfo(pipelineConfig2);
-        pipelineConfig2.renderPass = renderPass;
-        pipelineConfig2.pipelineLayout = texturedPipelineLayout;
-
-        texturedLvePipeline = std::make_unique<LvePipeline>(
-            lveDevice,
-            "shaders/tex_shader.vert.spv",
-            "shaders/tex_shader.frag.spv",
-            pipelineConfig2);
+        coloredPlainPipelineInfo = pipelineManager.getPipeline(colored_plain).value();
+        // coloredPbrPipelineInfo = pipelineManager.getPipeline(colored_pbr).value();
+        texturedPlainPipelineInfo = pipelineManager.getPipeline(textured_plain).value();
+        // texturedPbrPipelineInfo = pipelineManager.getPipeline(textured_pbr).value();
     }
 
     void drawObject(LveGameObject& obj, FrameInfo& frameInfo, VkPipelineLayout pipelineLayout) {
@@ -126,10 +55,11 @@ namespace lve
     }
 
     void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
+        // common to all pipelines
         vkCmdBindDescriptorSets(
             frameInfo.commandBuffer,
             VK_PIPELINE_BIND_POINT_GRAPHICS,
-            coloredPipelineLayout,
+            coloredPlainPipelineInfo.layout,
             0,
             1,
             &frameInfo.globalDescriptorSet,
@@ -138,8 +68,10 @@ namespace lve
         );
 
         // separate objects with and without textures
-        std::vector<lve::LveGameObject*> texturedObjects{};
-        std::vector<lve::LveGameObject*> coloredObjects{};
+        std::vector<lve::LveGameObject*> coloredPlainObjects{};
+        // std::vector<lve::LveGameObject*> coloredPbrObjects{};
+        std::vector<lve::LveGameObject*> texturedPlainObjects{};
+        // std::vector<lve::LveGameObject*> texturedPbrObjects{};
 
         for (auto& kv: frameInfo.gameObjects) {
             auto obj = &kv.second;
@@ -148,16 +80,26 @@ namespace lve
             }
 
             if (obj->textureKey.has_value()) {
-                texturedObjects.push_back(obj);
+                texturedPlainObjects.push_back(obj);
             }
             else {
-                coloredObjects.push_back(obj);
+                coloredPlainObjects.push_back(obj);
             }
         }
 
+        PipelineInfo pipelineInfo;
+
+        // draw colored plain objects
+        pipelineInfo = coloredPlainPipelineInfo;
+        pipelineInfo.pipeline->bind(frameInfo.commandBuffer);
+        for (auto obj: coloredPlainObjects) {
+            drawObject(*obj, frameInfo, pipelineInfo.layout);
+        }
+
         // draw objects with texture
-        texturedLvePipeline->bind(frameInfo.commandBuffer);
-        for (auto obj: texturedObjects) {
+        pipelineInfo = texturedPlainPipelineInfo;
+        pipelineInfo.pipeline->bind(frameInfo.commandBuffer);
+        for (auto obj: texturedPlainObjects) {
             std::string textureKey = obj->textureKey.value();
             VkDescriptorSet descriptorSet;
             if (!textureManager.getTextureDescriptorSet(textureKey, descriptorSet)) {
@@ -167,7 +109,7 @@ namespace lve
             vkCmdBindDescriptorSets(
                 frameInfo.commandBuffer,
                 VK_PIPELINE_BIND_POINT_GRAPHICS,
-                texturedPipelineLayout,
+                pipelineInfo.layout,
                 1,
                 1,
                 &descriptorSet,
@@ -175,13 +117,7 @@ namespace lve
                 nullptr
             );
 
-            drawObject(*obj, frameInfo, texturedPipelineLayout);
-        }
-
-        // draw objects without texture
-        coloredLvePipeline->bind(frameInfo.commandBuffer);
-        for (auto obj: coloredObjects) {
-            drawObject(*obj, frameInfo, coloredPipelineLayout);
+            drawObject(*obj, frameInfo, pipelineInfo.layout);
         }
     }
 }

@@ -7,6 +7,8 @@
 #include "lve_renderer.hpp"
 #include "lve_descriptors.hpp"
 #include "texture_manager.hpp"
+#include "material_manager.hpp"
+#include "pipeline_manager.hpp"
 
 #define MAX_LIGHT_SOURCES 128
 
@@ -53,6 +55,8 @@ namespace lve {
         LveDevice lveDevice{lveWindow};
         LveRenderer lveRenderer{lveWindow, lveDevice};
         TextureManager textureManager{lveDevice};
+        MaterialManager materialManager{lveDevice};
+        PipelineManager pipelineManager{lveDevice, lveRenderer.getSwapChainRenderPass()};
 
         std::unique_ptr<LveDescriptorPool> globalPool;
         std::unique_ptr<LveDescriptorPool> textureDescriptorPool;

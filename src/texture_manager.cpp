@@ -11,9 +11,6 @@ namespace lve {
     }
 
     TextureManager::~TextureManager() {
-        // vkDestroyDescriptorPool(lveDevice.device(), textureDescriptorPool, nullptr);
-        // vkDestroyDescriptorSetLayout(lveDevice.device(), getTextureDescriptorSetLayout(), nullptr);
-
         destroyTextureAllocations();
     }
 

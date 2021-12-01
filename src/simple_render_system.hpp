@@ -7,6 +7,8 @@
 #include "lve_game_object.hpp"
 #include "lve_frame_info.hpp"
 #include "texture_manager.hpp"
+#include "material_manager.hpp"
+#include "pipeline_manager.hpp"
 
 // std
 #include <memory>
@@ -19,9 +21,8 @@ namespace lve {
         SimpleRenderSystem(
             LveDevice& device,
             TextureManager& _textureManager, 
-            VkRenderPass renderPass, 
-            VkDescriptorSetLayout globalSetLayout, 
-            VkDescriptorSetLayout textureSetLayout);
+            MaterialManager& materialManager,
+            PipelineManager& pipelineManager);
         ~SimpleRenderSystem();  
 
         SimpleRenderSystem(const SimpleRenderSystem&) = delete;
@@ -30,15 +31,14 @@ namespace lve {
         void renderGameObjects(FrameInfo& frameInfo);
 
     private:
-        void createPipelineLayout(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout);
-        void createPipeline(VkRenderPass& renderPass);
-
         LveDevice& lveDevice;
         TextureManager& textureManager;
+        MaterialManager& materialManager;
+        PipelineManager& pipelineManager;
 
-        std::unique_ptr<LvePipeline> coloredLvePipeline;
-        VkPipelineLayout coloredPipelineLayout;
-        std::unique_ptr<LvePipeline> texturedLvePipeline;
-        VkPipelineLayout texturedPipelineLayout;
+        PipelineInfo coloredPlainPipelineInfo;
+        // PipelineInfo coloredPbrPipelineInfo;
+        PipelineInfo texturedPlainPipelineInfo;
+        // PipelineInfo texturedPbrPipelineInfo;
     };
 }

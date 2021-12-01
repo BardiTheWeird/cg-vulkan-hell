@@ -6,6 +6,7 @@
 #include "lve_buffer.hpp"
 #include "game_systems.hpp"
 #include "scenes/scenes.hpp"
+#include "pipeline_loader.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -58,13 +59,19 @@ namespace lve
                 .build(globalDescriptorSets[i]);
         }
 
+        PipelineLoader::loadPipelines(
+            lveDevice, 
+            pipelineManager, 
+            globalSetLayout->getDescriptorSetLayout(),
+            textureManager.getTextureDescriptorSetLayout(),
+            materialManager.getDescriptorSetLayout()
+        );
 
         SimpleRenderSystem simpleRenderSystem{
             lveDevice,
             textureManager, 
-            lveRenderer.getSwapChainRenderPass(), 
-            globalSetLayout->getDescriptorSetLayout(),
-            textureManager.getTextureDescriptorSetLayout()
+            materialManager,
+            pipelineManager
         };
         LveCamera camera{};
 
