@@ -92,34 +92,38 @@ namespace lve
         PipelineInfo pipelineInfo;
 
         // draw colored plain objects
-        pipelineInfo = coloredPlainPipelineInfo;
-        pipelineInfo.pipeline->bind(frameInfo.commandBuffer);
-        for (auto obj: coloredPlainObjects) {
-            drawObject(*obj, frameInfo, pipelineInfo.layout);
+        if (coloredPlainObjects.size() > 0) {
+            pipelineInfo = coloredPlainPipelineInfo;
+            pipelineInfo.pipeline->bind(frameInfo.commandBuffer);
+            for (auto obj: coloredPlainObjects) {
+                drawObject(*obj, frameInfo, pipelineInfo.layout);
+            }    
         }
 
-        // draw objects with texture
-        pipelineInfo = texturedPlainPipelineInfo;
-        pipelineInfo.pipeline->bind(frameInfo.commandBuffer);
-        for (auto obj: texturedPlainObjects) {
-            std::string textureKey = obj->textureKey.value();
-            VkDescriptorSet descriptorSet;
-            if (!textureManager.getTextureDescriptorSet(textureKey, descriptorSet)) {
-                throw std::runtime_error("Couldn't find a texture with key " + textureKey);
+        if (texturedPlainObjects.size() > 0) {
+            // draw objects with texture
+            pipelineInfo = texturedPlainPipelineInfo;
+            pipelineInfo.pipeline->bind(frameInfo.commandBuffer);
+            for (auto obj: texturedPlainObjects) {
+                std::string textureKey = obj->textureKey.value();
+                VkDescriptorSet descriptorSet;
+                if (!textureManager.getTextureDescriptorSet(textureKey, descriptorSet)) {
+                    throw std::runtime_error("Couldn't find a texture with key " + textureKey);
+                }
+
+                vkCmdBindDescriptorSets(
+                    frameInfo.commandBuffer,
+                    VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    pipelineInfo.layout,
+                    1,
+                    1,
+                    &descriptorSet,
+                    0,
+                    nullptr
+                );
+
+                drawObject(*obj, frameInfo, pipelineInfo.layout);
             }
-
-            vkCmdBindDescriptorSets(
-                frameInfo.commandBuffer,
-                VK_PIPELINE_BIND_POINT_GRAPHICS,
-                pipelineInfo.layout,
-                1,
-                1,
-                &descriptorSet,
-                0,
-                nullptr
-            );
-
-            drawObject(*obj, frameInfo, pipelineInfo.layout);
         }
     }
 }
