@@ -50,13 +50,14 @@ namespace lve
             pipelineManager
         );
 
+        loadGameObjects();
+
         gameSystemManager = std::make_unique<GameSystemManager>(
             lveDevice,
             materialManager,
-            *simpleRenderSystem
+            *simpleRenderSystem,
+            gameObjects
         );
-
-        loadGameObjects();
     }
 
     FirstApp::~FirstApp() {}

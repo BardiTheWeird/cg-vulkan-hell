@@ -41,6 +41,8 @@ namespace lve {
         cube.transform.translation = {.0f, -0.5f, 5.5f};
         cube.transform.scale = {.01f, .01f, .01f};
 
+        cube.repeatMovement = {{8}};
+
         // cube.textureKey = {"weird-shit"};
         cube.textureKey = ina_super_artsy;
         cube.material = {{ materialManager.allocateMaterial() }};
@@ -52,6 +54,8 @@ namespace lve {
         cube2.transform.translation = {1.f, 0.f, 2.5f};
         cube2.transform.rotation = {0.f, glm::quarter_pi<float>(), 0.f};
         cube2.transform.scale = {.5f, .5f, .5f};
+
+        cube2.repeatMovement = {{8}};
 
         cube2.textureKey = ina_super_artsy;
 
@@ -78,6 +82,7 @@ namespace lve {
 
         flatVase.textureKey = sui_chan_guitar;
         flatVase.material = {{ materialManager.allocateMaterial() }};
+        flatVase.repeatMovement = {{ 10 }};
 
         gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 

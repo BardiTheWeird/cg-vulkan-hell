@@ -7,6 +7,7 @@
 
 // std
 #include <vector>
+#include <unordered_set>
 
 namespace lve {
 
@@ -15,7 +16,7 @@ namespace lve {
         GameSystemManager(const GameSystemManager&) = delete;
         GameSystemManager &operator=(const GameSystemManager&) = delete;
 
-        GameSystemManager(LveDevice& lveDevice, MaterialManager& materialManager, SimpleRenderSystem& simpleRenderSystem);
+        GameSystemManager(LveDevice& lveDevice, MaterialManager& materialManager, SimpleRenderSystem& simpleRenderSystem, LveGameObject::Map& gameObjects);
 
         void executeAll(FrameInfo& frameInfo);
 
@@ -25,9 +26,13 @@ namespace lve {
         SimpleRenderSystem& renderSystem;
 
         std::vector<MoveEvent> moveEvents{};
+        std::unordered_map<LveGameObject::id_t, std::vector<LveGameObject::id_t>> flattenedMovementDependencyMap{};
+
+        void buildMovementDependencyMap(LveGameObject::Map& gameObjects);
 
         void enactVelocityAcceleration(FrameInfo& frameInfo);
         void moveCircle(FrameInfo& frameInfo);
+        void enactRepeatMovement(FrameInfo& frameInfo);
         void applyMoveEvents(FrameInfo& frameInfo);
         void updateMaterials(FrameInfo& frameInfo);
     };
