@@ -18,15 +18,15 @@ namespace lve {
     
     class SimpleRenderSystem {
     public:
+        SimpleRenderSystem(const SimpleRenderSystem&) = delete;
+        SimpleRenderSystem &operator=(const SimpleRenderSystem&) = delete;
+
         SimpleRenderSystem(
             LveDevice& device,
             TextureManager& _textureManager, 
             MaterialManager& materialManager,
             PipelineManager& pipelineManager);
         ~SimpleRenderSystem();  
-
-        SimpleRenderSystem(const SimpleRenderSystem&) = delete;
-        SimpleRenderSystem &operator=(const SimpleRenderSystem&) = delete;
 
         void renderGameObjects(FrameInfo& frameInfo);
 

@@ -1,14 +1,28 @@
-#include "game_systems.hpp"
+#include "game_system_manager.hpp"
 #include "utils/helpers.hpp"
+#include <iostream>
 
 namespace lve {
 
-    void GameSystems::executeAll(FrameInfo& frameInfo) {
+    GameSystemManager::GameSystemManager(
+        LveDevice& _lveDevice, 
+        MaterialManager& _materialManager, 
+        SimpleRenderSystem& _simpleRenderSystem) 
+        : lveDevice{_lveDevice}, 
+        materialManager{_materialManager}, 
+        renderSystem{_simpleRenderSystem}
+        {
+
+        }
+
+    void GameSystemManager::executeAll(FrameInfo& frameInfo) {
         move(frameInfo);
         moveCircle(frameInfo);
+
+        renderSystem.renderGameObjects(frameInfo);
     }
 
-    void GameSystems::move(FrameInfo& frameInfo) {
+    void GameSystemManager::move(FrameInfo& frameInfo) {
         float frameTime = frameInfo.frameTime;
 
         for (auto& kv : frameInfo.gameObjects) {
@@ -25,7 +39,7 @@ namespace lve {
         }
     }
 
-    void GameSystems::moveCircle(FrameInfo& frameInfo) {
+    void GameSystemManager::moveCircle(FrameInfo& frameInfo) {
         for (auto& kv : frameInfo.gameObjects) {
             auto& obj = kv.second;
             if (!obj.circularMovement.has_value())

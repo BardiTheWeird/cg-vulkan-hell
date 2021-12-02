@@ -28,7 +28,7 @@ namespace lve
                 pipelineManager{_pipelineManager} 
             {
                 using namespace constants::pipeline_keys;
-
+                
                 coloredPlainPipelineInfo = pipelineManager.getPipeline(colored_plain).value();
                 coloredPbrPipelineInfo = pipelineManager.getPipeline(colored_pbr).value();
                 texturedPlainPipelineInfo = pipelineManager.getPipeline(textured_plain).value();
@@ -57,6 +57,8 @@ namespace lve
     }
 
     void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
+
+        std::cout << "sheet on the table" << std::endl; 
         // common to all pipelines
         vkCmdBindDescriptorSets(
             frameInfo.commandBuffer,
