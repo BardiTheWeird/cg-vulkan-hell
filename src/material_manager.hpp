@@ -33,15 +33,13 @@ namespace lve {
 
     private:
         struct MaterialUbo {
-            glm::vec4 albedoAndRoughness{}; // albedo at .xyz; roughness at .w
-            glm::vec4 baseReflectanceAndMetallicCoefficient{}; // baseReflectance at .xyz; metallicCoefficient at .w
-            glm::vec4 emissivityMesh{}; // .w is empty
+            glm::vec4 albedoReflectanceRoughnessMetallic{}; // albedo at .x; reflectness at .y; roughness at w; metallic at .w
+            glm::vec4 emissivityMesh{}; // .w is brightness
 
             static MaterialUbo fromComponent(const MaterialComponent& component) {
                 return MaterialUbo {
-                    {component.albedoMesh, component.roughness},
-                    {component.baseReflectance, component.metallicCoefficient},
-                    {component.emissivityMesh}
+                    {component.albedoMesh, component.baseReflectance, component.roughness, component.metallicCoefficient},
+                    component.emissivityMesh
                 };
             }
         };

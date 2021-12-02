@@ -44,8 +44,7 @@ layout (set = 0, binding = 0) uniform GlobalUbo {
 layout (set = 1, binding = 0) uniform sampler2D tex1;
 
 layout (set = 2, binding = 0) uniform MaterialUbo {
-    vec4 albedoAndRoughness; // albedo at .xyz; roughness at .w
-    vec4 baseReflectanceAndMetallicCoefficient; // baseReflectance at .xyz; metallicCoefficient at .w
+    vec4 albedoReflectanceRoughnessMetallic; // albedo at .x; reflectance at .y; roughness at w; metallic at .w
     vec4 emissivityMesh; // .w is brightness
 } material;
 
@@ -132,10 +131,10 @@ vec3 PostProcessing(vec3 inColor) {
 }
 
 void main() {
-    vec3 albedo = material.albedoAndRoughness.xyz;
-    float roughness = material.albedoAndRoughness.w;
-    vec3 baseReflectance = material.baseReflectanceAndMetallicCoefficient.xyz;
-    float metallicCoefficient = material.baseReflectanceAndMetallicCoefficient.w;
+    vec3 albedo = vec3(material.albedoReflectanceRoughnessMetallic.x);
+    vec3 baseReflectance = vec3(material.albedoReflectanceRoughnessMetallic.y);
+    float roughness = material.albedoReflectanceRoughnessMetallic.z;
+    float metallicCoefficient = material.albedoReflectanceRoughnessMetallic.w;
     vec3 emissivity = material.emissivityMesh.xyz * material.emissivityMesh.w;
 
     vec3 meshColor = texture(tex1, texCoord).xyz;
