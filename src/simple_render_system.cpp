@@ -57,8 +57,6 @@ namespace lve
     }
 
     void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
-
-        std::cout << "sheet on the table" << std::endl; 
         // common to all pipelines
         vkCmdBindDescriptorSets(
             frameInfo.commandBuffer,

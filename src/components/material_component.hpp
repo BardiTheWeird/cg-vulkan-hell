@@ -18,6 +18,6 @@ namespace lve {
         glm::vec3 baseReflectance{0.3};
         float metallicCoefficient{0.0};
 
-        bool updatedThisFrame;
+        bool updatedThisFrame{true};
     };
 }

@@ -8,17 +8,15 @@ namespace lve {
         LveDevice& _lveDevice, 
         MaterialManager& _materialManager, 
         SimpleRenderSystem& _simpleRenderSystem) 
-        : lveDevice{_lveDevice}, 
-        materialManager{_materialManager}, 
-        renderSystem{_simpleRenderSystem}
-        {
-
-        }
+            : lveDevice{_lveDevice}, 
+            materialManager{_materialManager}, 
+            renderSystem{_simpleRenderSystem} {}
 
     void GameSystemManager::executeAll(FrameInfo& frameInfo) {
         move(frameInfo);
         moveCircle(frameInfo);
 
+        updateMaterials(frameInfo);
         renderSystem.renderGameObjects(frameInfo);
     }
 
@@ -57,4 +55,12 @@ namespace lve {
         }
     }
 
+    void GameSystemManager::updateMaterials(FrameInfo& frameInfo) {
+        for (auto& kv: frameInfo.gameObjects) {
+            auto& obj = kv.second;
+            if (obj.material.has_value() && obj.material.value().updatedThisFrame) {
+                materialManager.updateMaterial(obj.material.value());
+            }
+        }
+    }
 }

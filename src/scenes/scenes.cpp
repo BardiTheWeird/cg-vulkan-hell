@@ -143,12 +143,12 @@ namespace lve {
 
         gameObjects.emplace(pointLight2.getId(), std::move(pointLight2));
 
-        for (auto& kv: gameObjects) {
-            auto& obj = kv.second;
-            if (obj.material.has_value()) {
-                materialManager.updateMaterial(obj.material.value());
-            }
-        }
+        // for (auto& kv: gameObjects) {
+        //     auto& obj = kv.second;
+        //     if (obj.material.has_value()) {
+        //         materialManager.updateMaterial(obj.material.value());
+        //     }
+        // }
 
         return gameObjects;
     }
