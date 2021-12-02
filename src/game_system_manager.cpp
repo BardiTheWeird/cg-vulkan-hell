@@ -13,14 +13,15 @@ namespace lve {
             renderSystem{_simpleRenderSystem} {}
 
     void GameSystemManager::executeAll(FrameInfo& frameInfo) {
-        move(frameInfo);
+        enactVelocityAcceleration(frameInfo);
         moveCircle(frameInfo);
+        applyMoveEvents(frameInfo);
 
         updateMaterials(frameInfo);
         renderSystem.renderGameObjects(frameInfo);
     }
 
-    void GameSystemManager::move(FrameInfo& frameInfo) {
+    void GameSystemManager::enactVelocityAcceleration(FrameInfo& frameInfo) {
         float frameTime = frameInfo.frameTime;
 
         for (auto& kv : frameInfo.gameObjects) {
@@ -32,8 +33,12 @@ namespace lve {
             velocityAcceleration->velocity += velocityAcceleration->acceleration * frameTime;
             velocityAcceleration->rotationVelocity += velocityAcceleration->rotationAcceleration * frameTime;
 
-            obj.transform.shift(velocityAcceleration->velocity * frameTime);
+            // obj.transform.shift(velocityAcceleration->velocity * frameTime);
             obj.transform.rotate(velocityAcceleration->rotationVelocity * frameTime);
+            moveEvents.push_back({
+                obj.getId(),
+                velocityAcceleration->velocity * frameTime
+            });
         }
     }
 
@@ -48,10 +53,25 @@ namespace lve {
             auto rotation = circ->rotation * circ->speed * frameInfo.frameTime;
 
             auto curPos = obj.transform.translation;
-            obj.transform.translation = 
+            auto newPos = 
                 RotationHelpers::getRotationMatrix(rotation) 
                 * (curPos - center)
                 + center;
+
+            moveEvents.push_back({
+                obj.getId(),
+                newPos - curPos
+            });
+        }
+    }
+
+    void GameSystemManager::applyMoveEvents(FrameInfo& frameInfo) {
+        while (moveEvents.size() > 0) {
+            auto event = moveEvents.back();
+            auto& obj = frameInfo.gameObjects.at(event.objectId);
+            obj.transform.shift(event.movement);
+            
+            moveEvents.pop_back();
         }
     }
 
