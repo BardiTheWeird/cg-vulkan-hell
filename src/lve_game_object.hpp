@@ -37,7 +37,7 @@ namespace lve
         const id_t getId() { return id; }
 
         bool isVisible{true};
-        std::shared_ptr<LveModel> model{};
+        std::optional<std::string> modelKey = std::nullopt;
         std::optional<std::string> textureKey = std::nullopt;
         std::optional<MaterialComponent> material = std::nullopt;
 

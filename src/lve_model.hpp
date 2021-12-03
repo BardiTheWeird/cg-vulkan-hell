@@ -12,10 +12,6 @@
 #include <vector>
 #include <unordered_map>
 
-#ifndef ENGINE_DIR
-#define ENGINE_DIR "../"
-#endif
-
 namespace lve {
     class LveModel {
     public:

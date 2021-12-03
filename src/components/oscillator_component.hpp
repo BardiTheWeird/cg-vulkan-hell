@@ -66,7 +66,6 @@ namespace lve {
 
                 oscillator->actOnGameObject = [oldAction = move(oscillator->actOnGameObject), action = action]
                 (float sampledValue, float dt, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
-                    std::cout << "invoking action!" << std::endl;
                     action(sampledValue, dt, gameObject, moveEvents);
                     oldAction(sampledValue, dt, gameObject, moveEvents);
                 };

@@ -47,7 +47,8 @@ namespace lve
             lveDevice,
             textureManager, 
             materialManager,
-            pipelineManager
+            pipelineManager,
+            modelManager
         );
 
         loadGameObjects();
@@ -137,7 +138,7 @@ namespace lve
     }
 
     void FirstApp::loadGameObjects() {
-        gameObjects = std::move(Scenes::loadTestScene1(lveDevice, textureManager, materialManager));
+        gameObjects = std::move(Scenes::loadTestScene1(lveDevice, textureManager, materialManager, modelManager));
     }
 
     void FirstApp::getLightSources(GlobalUbo& ubo) {

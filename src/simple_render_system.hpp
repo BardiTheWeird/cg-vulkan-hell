@@ -9,6 +9,7 @@
 #include "texture_manager.hpp"
 #include "material_manager.hpp"
 #include "pipeline_manager.hpp"
+#include "model_manager.hpp"
 
 // std
 #include <memory>
@@ -25,7 +26,8 @@ namespace lve {
             LveDevice& device,
             TextureManager& _textureManager, 
             MaterialManager& materialManager,
-            PipelineManager& pipelineManager);
+            PipelineManager& pipelineManager,
+            ModelManager& modelManager);
         ~SimpleRenderSystem();  
 
         void renderGameObjects(FrameInfo& frameInfo);
@@ -35,10 +37,13 @@ namespace lve {
         TextureManager& textureManager;
         MaterialManager& materialManager;
         PipelineManager& pipelineManager;
+        ModelManager& modelManager;
 
         PipelineInfo coloredPlainPipelineInfo;
         PipelineInfo coloredPbrPipelineInfo;
         PipelineInfo texturedPlainPipelineInfo;
         PipelineInfo texturedPbrPipelineInfo;
+
+        void drawObject(LveGameObject& obj, FrameInfo& frameInfo, VkPipelineLayout pipelineLayout);
     };
 }

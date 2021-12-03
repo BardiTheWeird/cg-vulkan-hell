@@ -10,6 +10,7 @@
 #include "material_manager.hpp"
 #include "pipeline_manager.hpp"
 #include "game_system_manager.hpp"
+#include "model_manager.hpp"
 
 #define MAX_LIGHT_SOURCES 128
 
@@ -59,6 +60,7 @@ namespace lve {
         TextureManager textureManager{lveDevice};
         MaterialManager materialManager{lveDevice};
         PipelineManager pipelineManager{lveDevice, lveRenderer.getSwapChainRenderPass()};
+        ModelManager modelManager{lveDevice};
 
         std::unique_ptr<SimpleRenderSystem> simpleRenderSystem;
         std::unique_ptr<GameSystemManager> gameSystemManager;

@@ -21,11 +21,13 @@ namespace lve
             LveDevice& device,
             TextureManager& _textureManager, 
             MaterialManager& _materialManager,
-            PipelineManager& _pipelineManager) 
+            PipelineManager& _pipelineManager,
+            ModelManager& _modelManager) 
                 : lveDevice{device}, 
                 textureManager{_textureManager}, 
                 materialManager{_materialManager},
-                pipelineManager{_pipelineManager} 
+                pipelineManager{_pipelineManager},
+                modelManager{_modelManager}
             {
                 using namespace constants::pipeline_keys;
                 
@@ -38,7 +40,7 @@ namespace lve
     SimpleRenderSystem::~SimpleRenderSystem() {
     }
 
-    void drawObject(LveGameObject& obj, FrameInfo& frameInfo, VkPipelineLayout pipelineLayout) {
+    void SimpleRenderSystem::drawObject(LveGameObject& obj, FrameInfo& frameInfo, VkPipelineLayout pipelineLayout) {
 
         SimplePushConstantData push{};
         push.modelMatrix = obj.transform.mat4();
@@ -52,8 +54,9 @@ namespace lve
             sizeof(SimplePushConstantData),
             &push);
 
-        obj.model->bind(frameInfo.commandBuffer);
-        obj.model->draw(frameInfo.commandBuffer);
+        auto model = modelManager.getModel(obj.modelKey.value()).value();
+        model->bind(frameInfo.commandBuffer);
+        model->draw(frameInfo.commandBuffer);
     }
 
     void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
@@ -77,7 +80,7 @@ namespace lve
 
         for (auto& kv: frameInfo.gameObjects) {
             auto obj = &kv.second;
-            if (obj->isVisible && obj->model == nullptr) {
+            if (!(obj->isVisible && obj->modelKey.has_value())) {
                 continue;
             }
 
