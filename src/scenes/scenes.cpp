@@ -105,32 +105,27 @@ namespace lve {
 
         // gameObjects.emplace(directionalLightGameObject.getId(), std::move(directionalLightGameObject));
 
-        // auto emissivityOscillator1 = OscillatorComponent::Builder()
-        //     .SetFrequency(0.25f)
-        //     .AddAction([](float sampledValue, LveGameObject& gameObject) {
-        //         gameObject.material.value().emissivityMesh.w = (sampledValue + 1.f) / 2.f;
-        //     })
-        //     .Build();
+        auto emissivityOscillator1 = OscillatorComponent::Builder()
+            .SetFrequency(1.f / 16.f)
+            .SetSamplingFunctionSin(1.f, .5f)
+            .AddAction([](float sampledValue, LveGameObject& gameObject) {
+                gameObject.material.value().emissivityMesh.w = sampledValue / 8.f;
+                gameObject.material.value().updatedThisFrame = true;
+                gameObject.lightSource.value().radius = 2.f + sampledValue * 10.f;
+            })
+            .Build();
 
-        auto emissivityOscillator1 = std::make_shared<OscillatorComponent>();
-        emissivityOscillator1->frequency = 1.f / 16.f;
-        emissivityOscillator1->actOnGameObject = [](float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
-            gameObject.material.value().emissivityMesh.w = (sampledValue + 1.f) / 2.f / 8.f;
-            gameObject.material.value().updatedThisFrame = true;
-            gameObject.lightSource.value().radius = 2.f + (sampledValue + 1.f) / 2.f * 10.f;
-            // gameObject.lightSource.value().radius = 0.f;
-        };
-        // emissivityOscillator1->samplingFunction = [](float t){return t;};
-
-        auto emissivityOscillator2 = std::make_shared<OscillatorComponent>();
-        emissivityOscillator2->curValue = .5f;
-        emissivityOscillator2->frequency = 2.f;
-        emissivityOscillator2->actOnGameObject = [](float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
-            gameObject.material.value().emissivityMesh.w = (sampledValue + 1.f) / 2.f / 8.f;
-            gameObject.material.value().updatedThisFrame = true;
-            gameObject.lightSource.value().radius = 1.f + (sampledValue + 1.f) / 2.f * 3.f;
-            // gameObject.lightSource.value().radius = 0.f;
-        };
+        auto emissivityOscillator2 = OscillatorComponent::Builder()
+            .SetPhase(90)
+            .SetFrequency(2.f)
+            .ShiftSamplingFunction(1.f)
+            .ScaleSamplingFunction(.5f)
+            .AddAction([](float sampledValue, LveGameObject& gameObject) {
+                gameObject.material.value().emissivityMesh.w = sampledValue / 8.f;
+                gameObject.material.value().updatedThisFrame = true;
+                gameObject.lightSource.value().radius = 1.f + sampledValue * 3.f;
+            })
+            .Build();
 
         // point lights
         auto pointLight1 = LightSource::createPoint({0.f, 0.f, 0.f}, 5.f, {0.f, 1.f, 1.f, 1.f});

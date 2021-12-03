@@ -18,7 +18,7 @@ namespace lve {
 
         std::function<float (float)> samplingFunction{[](float x){return std::sin(x * 2 * glm::pi<float>());}};
         std::function<void (float, float, LveGameObject&, std::vector<MoveEvent>&)> actOnGameObject{
-            [](float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {}
+            [](float sampledValue, float dt, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {}
         };
 
         float curValue{0.f};
@@ -27,7 +27,7 @@ namespace lve {
 
         class Builder {
         private:
-            OscillatorComponent* oscillator{};
+            OscillatorComponent* oscillator = new OscillatorComponent();
 
         public:
             Builder SetSamplingFunction(std::function<float (float)> function) {
@@ -35,22 +35,62 @@ namespace lve {
                 return *this;
             }
 
-            // Builder AddAction(std::function<void (float, float, LveGameObject&, std::vector<MoveEvent>&)> action) {
-            //     oscillator->actOnGameObject = [&](float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
-            //         std::cout << "invoking action!" << std::endl;
-            //         action(sampledValue, frameTime, gameObject, moveEvents);
-            //         oscillator->actOnGameObject(sampledValue, frameTime, gameObject, moveEvents);
-            //     };
-            //     return *this;
-            // }
+            Builder PipeSamplingFunction(std::function<float (float)> nextFunc) {
+                oscillator->samplingFunction = [oldFunction = move(oscillator->samplingFunction), nextFunc = nextFunc]
+                (float t) {
+                    return nextFunc(oldFunction(t));
+                };
+
+                return *this;
+            }
+
+            Builder ScaleSamplingFunction(float coeff) {
+                return PipeSamplingFunction([coeff=coeff](float t){ return t * coeff; });
+            }
+
+            Builder ShiftSamplingFunction(float amount) {
+                return PipeSamplingFunction([amount=amount](float t){ return t + amount; });
+            }
+
+            Builder SetSamplingFunctionLinear(float k, float b) {
+                return SetSamplingFunction([k=k, b=b](float x){ return k*x + b; });
+            }
+
+            Builder SetSamplingFunctionSin(float shiftVertical, float scale) {
+                return SetSamplingFunction([shiftVertical = shiftVertical, scale = scale](float x){ 
+                    return scale * (std::sin(x * 2 * glm::pi<float>()) + shiftVertical);
+                });
+            }
+
+            Builder AddAction(std::function<void (float, float, LveGameObject&, std::vector<MoveEvent>&)> action) {
+
+                oscillator->actOnGameObject = [oldAction = move(oscillator->actOnGameObject), action = action]
+                (float sampledValue, float dt, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
+                    std::cout << "invoking action!" << std::endl;
+                    action(sampledValue, dt, gameObject, moveEvents);
+                    oldAction(sampledValue, dt, gameObject, moveEvents);
+                };
+                return *this;
+            }
+
+            Builder AddAction(std::function<void (float, float, LveGameObject&)> action) {
+
+                oscillator->actOnGameObject = [oldAction = move(oscillator->actOnGameObject), action = action]
+                (float sampledValue, float dt, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
+                    std::cout << "invoking action!" << std::endl;
+                    action(sampledValue, dt, gameObject);
+                    oldAction(sampledValue, dt, gameObject, moveEvents);
+                };
+                return *this;
+            }
 
             Builder AddAction(std::function<void (float, LveGameObject&)> action) {
-                oscillator->actOnGameObject = [oldAction = oscillator->actOnGameObject, action = action]
-                    (float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) 
+
+                oscillator->actOnGameObject = [oldAction = move(oscillator->actOnGameObject), action = action]
+                    (float sampledValue, float dt, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) 
                 {
-                    std::cout << "invoking action!" << std::endl;
                     action(sampledValue, gameObject);
-                    oldAction(sampledValue, frameTime, gameObject, moveEvents);
+                    oldAction(sampledValue, dt, gameObject, moveEvents);
                 };
                 return *this;
             }
@@ -66,8 +106,16 @@ namespace lve {
                 return *this;
             }
 
-            OscillatorComponent* Build() {
-                return oscillator;
+            Builder SetPhase(float phase) {
+                float phaseMapped = glm::mod<float>(phase, 180.f) / 180.f;
+                oscillator->curValue = phaseMapped > 0.f
+                    ? phaseMapped
+                    : 1 - phaseMapped;
+                return *this;
+            }
+
+            std::shared_ptr<OscillatorComponent> Build() {
+                return std::make_shared<OscillatorComponent>(*oscillator);
             }
         };
     };
