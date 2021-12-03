@@ -133,7 +133,6 @@ namespace lve {
     }
 
     void GameSystemManager::advanceOscillators(FrameInfo& frameInfo) {
-        std::cout << "trying to invoke oscillators..." << std::endl;
         for (auto& kv: frameInfo.gameObjects) {
             auto& obj = kv.second;
             for (auto& oscillator: obj.oscillators) {

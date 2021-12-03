@@ -63,5 +63,7 @@ namespace lve {
 
         auto ubo = MaterialUbo::fromComponent(component);
         allocations.buffer->writeToBuffer((void*)&ubo);
+
+        component.updatedThisFrame = false;
     }
 }

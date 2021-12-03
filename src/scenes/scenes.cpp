@@ -116,6 +116,7 @@ namespace lve {
         emissivityOscillator1->frequency = 1.f / 16.f;
         emissivityOscillator1->actOnGameObject = [](float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
             gameObject.material.value().emissivityMesh.w = (sampledValue + 1.f) / 2.f / 8.f;
+            gameObject.material.value().updatedThisFrame = true;
             gameObject.lightSource.value().radius = 2.f + (sampledValue + 1.f) / 2.f * 10.f;
             // gameObject.lightSource.value().radius = 0.f;
         };
@@ -126,6 +127,7 @@ namespace lve {
         emissivityOscillator2->frequency = 2.f;
         emissivityOscillator2->actOnGameObject = [](float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
             gameObject.material.value().emissivityMesh.w = (sampledValue + 1.f) / 2.f / 8.f;
+            gameObject.material.value().updatedThisFrame = true;
             gameObject.lightSource.value().radius = 1.f + (sampledValue + 1.f) / 2.f * 3.f;
             // gameObject.lightSource.value().radius = 0.f;
         };
