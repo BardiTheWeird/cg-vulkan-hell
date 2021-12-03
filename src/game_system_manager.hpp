@@ -32,8 +32,12 @@ namespace lve {
 
         void enactVelocityAcceleration(FrameInfo& frameInfo);
         void moveCircle(FrameInfo& frameInfo);
+        
+        void advanceOscillators(FrameInfo& frameInfo);
+
         void enactRepeatMovement(FrameInfo& frameInfo);
         void applyMoveEvents(FrameInfo& frameInfo);
+        
         void updateMaterials(FrameInfo& frameInfo);
     };
 }

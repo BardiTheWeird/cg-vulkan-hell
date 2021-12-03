@@ -60,6 +60,7 @@ namespace lve {
 
         case LightSourceKind::PointLight:
             dto.value1 = {obj.transform.translation, 0.f};
+            dto.color.w = BRIGHTNESS_AT_RADIUS * lightSource.radius * lightSource.radius;
             break;
         
         default:

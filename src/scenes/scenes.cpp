@@ -1,4 +1,5 @@
 #include "scenes.hpp"
+#include "../components/oscillator_component.hpp"
 
 namespace lve {
 
@@ -25,7 +26,7 @@ namespace lve {
         std::shared_ptr<LveModel> coloreCubeModel = LveModel::createModelFromFile(device, "models/colored_cube.obj");
 
         std::shared_ptr<LveModel> originModel = LveModel::createModelFromFile(device, "models/sphere.obj");
-        std::shared_ptr<LveModel> masterballModel = LveModel::createModelFromFile(device, "models/Masterball.obj");
+        // std::shared_ptr<LveModel> masterballModel = LveModel::createModelFromFile(device, "models/Masterball.obj");
 
         auto fourWallsObject = LveGameObject::createGameObject();
         fourWallsObject.model = whiteCubeInvertedNormals;
@@ -37,7 +38,7 @@ namespace lve {
         gameObjects.emplace(fourWallsObject.getId(), std::move(fourWallsObject));
 
         auto cube = LveGameObject::createGameObject();
-        cube.model = masterballModel;
+        cube.model = originModel;
         cube.transform.translation = {.0f, -0.5f, 5.5f};
         cube.transform.scale = {.01f, .01f, .01f};
 
@@ -71,6 +72,16 @@ namespace lve {
         smoothVase.textureKey = sui_chan_guitar;
         smoothVase.material = {{ materialManager.allocateMaterial() }};
 
+        auto ellipsisOscillator = std::make_shared<OscillatorComponent>();
+        ellipsisOscillator->frequency = 1.f / 4.f;
+        ellipsisOscillator->actOnGameObject = [](float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
+            float t = (sampledValue + 1.f) / 2.f;
+            gameObject.transform.translation.x = t * 2;
+            gameObject.transform.translation.z = t * 4;
+        };
+
+        smoothVase.oscillators.push_back(ellipsisOscillator);
+
         gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
         std::shared_ptr<LveModel> lveModel4 = LveModel::createModelFromFile(device, "models/flat_vase.obj");
@@ -94,6 +105,31 @@ namespace lve {
 
         // gameObjects.emplace(directionalLightGameObject.getId(), std::move(directionalLightGameObject));
 
+        // auto emissivityOscillator1 = OscillatorComponent::Builder()
+        //     .SetFrequency(0.25f)
+        //     .AddAction([](float sampledValue, LveGameObject& gameObject) {
+        //         gameObject.material.value().emissivityMesh.w = (sampledValue + 1.f) / 2.f;
+        //     })
+        //     .Build();
+
+        auto emissivityOscillator1 = std::make_shared<OscillatorComponent>();
+        emissivityOscillator1->frequency = 1.f / 16.f;
+        emissivityOscillator1->actOnGameObject = [](float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
+            gameObject.material.value().emissivityMesh.w = (sampledValue + 1.f) / 2.f / 8.f;
+            gameObject.lightSource.value().radius = 2.f + (sampledValue + 1.f) / 2.f * 10.f;
+            // gameObject.lightSource.value().radius = 0.f;
+        };
+        // emissivityOscillator1->samplingFunction = [](float t){return t;};
+
+        auto emissivityOscillator2 = std::make_shared<OscillatorComponent>();
+        emissivityOscillator2->curValue = .5f;
+        emissivityOscillator2->frequency = 2.f;
+        emissivityOscillator2->actOnGameObject = [](float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
+            gameObject.material.value().emissivityMesh.w = (sampledValue + 1.f) / 2.f / 8.f;
+            gameObject.lightSource.value().radius = 1.f + (sampledValue + 1.f) / 2.f * 3.f;
+            // gameObject.lightSource.value().radius = 0.f;
+        };
+
         // point lights
         auto pointLight1 = LightSource::createPoint({0.f, 0.f, 0.f}, 5.f, {0.f, 1.f, 1.f, 1.f});
         pointLight1.transform.translation = {0.f, -3.f, 3.f};
@@ -107,6 +143,8 @@ namespace lve {
             material.emissivityMesh = {0.f, 1.f, 1.f, .1f};
             pointLight1.material = {material};
         }
+
+        pointLight1.oscillators.push_back(emissivityOscillator1);
 
         CircularMovementComponent pointLight1CircularMovement{};
         pointLight1CircularMovement.center = {0.f, 0.f, 3.f};
@@ -134,6 +172,8 @@ namespace lve {
             material.emissivityMesh = {1.f, 1.f, 0.f, .02f};
             pointLight2.material = {material};
         }
+
+        pointLight2.oscillators.push_back(emissivityOscillator1);
 
         CircularMovementComponent pointLight2CircularMovement{};
         pointLight2CircularMovement.center = {0.f, 3.f, 3.f};

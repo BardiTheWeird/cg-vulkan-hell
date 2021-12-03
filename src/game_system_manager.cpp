@@ -82,6 +82,8 @@ namespace lve {
         enactRepeatMovement(frameInfo);
         applyMoveEvents(frameInfo);
 
+        advanceOscillators(frameInfo);
+
         updateMaterials(frameInfo);
         renderSystem.renderGameObjects(frameInfo);
     }
@@ -127,6 +129,16 @@ namespace lve {
                 obj.getId(),
                 newPos - curPos
             });
+        }
+    }
+
+    void GameSystemManager::advanceOscillators(FrameInfo& frameInfo) {
+        std::cout << "trying to invoke oscillators..." << std::endl;
+        for (auto& kv: frameInfo.gameObjects) {
+            auto& obj = kv.second;
+            for (auto& oscillator: obj.oscillators) {
+                oscillator->advance(frameInfo.frameTime, obj, moveEvents);
+            }
         }
     }
 
