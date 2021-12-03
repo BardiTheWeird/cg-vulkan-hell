@@ -185,9 +185,16 @@ namespace lve {
 
     void Scenes::loadCoordinateSystem(LveDevice& device, LveGameObject::Map& gameObjects, TextureManager& textureManager) {
         auto origin = LveGameObject::createGameObject();
+        std::cout << "origin id: " << origin.getId() << std::endl;
         origin.modelKey = "sphere";
         origin.transform.scale = {.05f, .05f, .05f};
         origin.textureKey = "sui-chan-guitar";
+
+        {
+            VelocityAccelerationComponent va{};
+            va.velocity = {0.f, 0.f, 0.1f};
+            origin.velocityAcceleration = va;
+        }
 
         auto xArrow = LveGameObject::createGameObject();
         xArrow.modelKey = "cone";
@@ -204,11 +211,19 @@ namespace lve {
         yArrow.textureKey = "sui-chan-guitar";
 
         auto zArrow = LveGameObject::createGameObject();
-        zArrow.modelKey = "cone";
-        zArrow.transform.scale = {.05f, .05f, .05f};
-        zArrow.transform.translation = {0.f, 0.f, 0.1f};
+        zArrow.modelKey = "sphere";
+        zArrow.transform.scale = {.025f, .025f, .025f};
+        zArrow.transform.translation = {.25f, 0.f, 0.0f};
         zArrow.transform.rotation = {glm::half_pi<float>(), 0.f, 0.f};
         zArrow.textureKey = "sui-chan-guitar";
+
+        // zArrow.oscillators.push_back(
+        //     OscillatorComponent::GetEllipticMovement(.25f, 1.25f)
+        //     .SetFrequency(1.f / 4.f)
+        //     .Build()
+        // );
+
+        zArrow.repeatMovement = {0};
 
         gameObjects.emplace(origin.getId(), std::move(origin));
         gameObjects.emplace(xArrow.getId(), std::move(xArrow));

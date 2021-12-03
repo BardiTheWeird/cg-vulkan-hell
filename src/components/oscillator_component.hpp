@@ -56,6 +56,14 @@ namespace lve {
                 return SetSamplingFunction([k=k, b=b](float x){ return k*x + b; });
             }
 
+            Builder SetSamplingFunctionSquare(float magnitude = 1.f) {
+                return SetSamplingFunction([magnitude=magnitude](float t) {
+                    if (t <.5f)
+                        return magnitude;
+                    return -magnitude;
+                });
+            }
+
             Builder SetSamplingFunctionSin(float shiftVertical, float scale) {
                 return SetSamplingFunction([shiftVertical = shiftVertical, scale = scale](float x){ 
                     return scale * (std::sin(x * 2 * glm::pi<float>()) + shiftVertical);
@@ -117,5 +125,7 @@ namespace lve {
                 return std::make_shared<OscillatorComponent>(*oscillator);
             }
         };
+
+    static Builder GetEllipticMovement(float xRadius, float zRadius);
     };
 }
