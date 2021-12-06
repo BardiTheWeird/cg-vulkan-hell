@@ -45,6 +45,8 @@ namespace lve {
 
             Builder SetSamplingFunctionSin(float shiftVertical, float scale);
 
+            Builder AddAction(std::function<void (float, float, LveGameObject&, std::unordered_map<id_t, LveGameObject>&, std::vector<MoveEvent>&)> action);
+
             Builder AddAction(std::function<void (float, float, LveGameObject&, std::vector<MoveEvent>&)> action);
 
             Builder AddAction(std::function<void (float, float, LveGameObject&)> action);
@@ -60,10 +62,8 @@ namespace lve {
             std::shared_ptr<OscillatorComponent> Build();
         };
 
-    static Builder GetLinearMovement(glm::vec3 maxDisplacement, float period);
-
     static Builder GetEllipticMovement(float xRadius, float zRadius);
 
-    // static Builder GetCircularMovementAroundAnObject(LveGameObject::std::unordered_map<id_t, LveGameObject>& gameObjects, LveGameObject::id_t objId, float radius);
+    static Builder GetCircularMovementAroundAnObject(LveGameObject::id_t objId, float radius);
     };
 }

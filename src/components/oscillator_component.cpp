@@ -54,6 +54,17 @@ namespace lve {
                 });
             }
 
+            OscillatorComponent::Builder OscillatorComponent::Builder::AddAction(
+                std::function<void (float, float, LveGameObject&, std::unordered_map<id_t, LveGameObject>&, std::vector<MoveEvent>&)> action) {
+
+                oscillator->actOnGameObject = [oldAction = move(oscillator->actOnGameObject), action = action]
+                (float sampledValue, float dt, LveGameObject& gameObject, std::unordered_map<id_t, LveGameObject>& gameObjects, std::vector<MoveEvent>& moveEvents) {
+                    action(sampledValue, dt, gameObject, gameObjects, moveEvents);
+                    oldAction(sampledValue, dt, gameObject, gameObjects, moveEvents);
+                };
+                return *this;    
+            }
+
             OscillatorComponent::Builder OscillatorComponent::Builder::AddAction(std::function<void (float, float, LveGameObject&, std::vector<MoveEvent>&)> action) {
 
                 oscillator->actOnGameObject = [oldAction = move(oscillator->actOnGameObject), action = action]
@@ -108,22 +119,6 @@ namespace lve {
             std::shared_ptr<OscillatorComponent> OscillatorComponent::Builder::Build() {
                 return std::make_shared<OscillatorComponent>(*oscillator);
             }
-
-
-
-    OscillatorComponent::Builder OscillatorComponent::GetLinearMovement(glm::vec3 maxDisplacement, float period) {
-        auto direction = glm::normalize(maxDisplacement);
-        auto speed = maxDisplacement * 2.f / period;
-        return OscillatorComponent::Builder()
-            .SetSamplingFunctionSquare(1.f)
-            .AddAction([direction=direction,speed=speed](float sampledValue, float dt, LveGameObject& obj, std::vector<MoveEvent>& moveEvents) {
-                float dir = sampledValue > .5f;
-                moveEvents.push_back({
-                    obj.getId(),
-                    dir * direction * speed * dt
-                });
-            });
-    }
 
     OscillatorComponent::Builder OscillatorComponent::GetEllipticMovement(float xRadius, float zRadius) {
         auto getPosition = [xRadius=xRadius, zRadius=zRadius](float t) {
