@@ -18,6 +18,8 @@ namespace lve {
         float metallicCoefficient{0.0};
         glm::vec4 emissivityMesh{0.0};
 
+        bool ignoreLighting;
+
         bool updatedThisFrame{true};
     };
 }

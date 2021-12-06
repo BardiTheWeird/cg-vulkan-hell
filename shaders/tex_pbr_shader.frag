@@ -46,6 +46,7 @@ layout (set = 1, binding = 0) uniform sampler2D tex1;
 layout (set = 2, binding = 0) uniform MaterialUbo {
     vec4 albedoReflectanceRoughnessMetallic; // albedo at .x; reflectance at .y; roughness at w; metallic at .w
     vec4 emissivityMesh; // .w is brightness
+    ivec4 parameters; // .x is ignoreLighting; .yzw are empty
 } material;
 
 layout(push_constant) uniform Push {
@@ -131,6 +132,11 @@ vec3 PostProcessing(vec3 inColor) {
 }
 
 void main() {
+    if (material.parameters.x == 1) {
+        outColor = vec4(texture(tex1, texCoord).xyz, 1.0);
+        return;
+    }
+
     vec3 albedo = vec3(material.albedoReflectanceRoughnessMetallic.x);
     vec3 baseReflectance = vec3(material.albedoReflectanceRoughnessMetallic.y);
     float roughness = material.albedoReflectanceRoughnessMetallic.z;
