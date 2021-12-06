@@ -208,7 +208,8 @@ namespace lve {
         zArrow.textureKey = "sui-chan-guitar";
 
         zArrow.oscillators.push_back(
-            OscillatorComponent::GetCircularMovementAroundAnObject(0, .25f, 5.f, {0.f, 0.f, glm::quarter_pi<float>()})
+            OscillatorComponent::GetEllipticMovement(.75f, .25f, 5.f, {0.f, 0.f, glm::quarter_pi<float>()})
+            .MakeRelativeTo(0)
             .Build()
         );
 

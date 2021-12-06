@@ -53,6 +53,11 @@ namespace lve {
 
             Builder AddAction(std::function<void (float, LveGameObject&)> action);
 
+            Builder ShiftBy(glm::vec3 shift);
+
+            // Assumes that you set a position relative to {0, 0, 0} beforehand
+            Builder MakeRelativeTo(id_t objId);
+
             Builder SetBounds(float min, float max);
 
             Builder SetFrequency(float frequency);
@@ -62,8 +67,6 @@ namespace lve {
             std::shared_ptr<OscillatorComponent> Build();
         };
 
-    static Builder GetEllipticMovement(float xRadius, float zRadius);
-
-    static Builder GetCircularMovementAroundAnObject(id_t objId, float radius, float period, glm::vec3 rotation = glm::vec3{0.f});
+    static Builder GetEllipticMovement(float radius1, float radius2, float period, glm::vec3 rotation = glm::vec3{0.f});
     };
 }

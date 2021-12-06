@@ -60,8 +60,8 @@ namespace lve {
 
                 oscillator->actOnGameObject = [oldAction = move(oscillator->actOnGameObject), action = action]
                 (float sampledValue, float dt, LveGameObject& gameObject, std::unordered_map<id_t, LveGameObject>& gameObjects, std::vector<MoveEvent>& moveEvents) {
-                    action(sampledValue, dt, gameObject, gameObjects, moveEvents);
                     oldAction(sampledValue, dt, gameObject, gameObjects, moveEvents);
+                    action(sampledValue, dt, gameObject, gameObjects, moveEvents);
                 };
                 return *this;    
             }
@@ -70,8 +70,8 @@ namespace lve {
 
                 oscillator->actOnGameObject = [oldAction = move(oscillator->actOnGameObject), action = action]
                 (float sampledValue, float dt, LveGameObject& gameObject, std::unordered_map<id_t, LveGameObject>& gameObjects, std::vector<MoveEvent>& moveEvents) {
-                    action(sampledValue, dt, gameObject, moveEvents);
                     oldAction(sampledValue, dt, gameObject, gameObjects, moveEvents);
+                    action(sampledValue, dt, gameObject, moveEvents);
                 };
                 return *this;
             }
@@ -81,8 +81,8 @@ namespace lve {
                 oscillator->actOnGameObject = [oldAction = move(oscillator->actOnGameObject), action = action]
                 (float sampledValue, float dt, LveGameObject& gameObject, std::unordered_map<id_t, LveGameObject>& gameObjects, std::vector<MoveEvent>& moveEvents) {
                     std::cout << "invoking action!" << std::endl;
-                    action(sampledValue, dt, gameObject);
                     oldAction(sampledValue, dt, gameObject, gameObjects, moveEvents);
+                    action(sampledValue, dt, gameObject);
                 };
                 return *this;
             }
@@ -92,11 +92,30 @@ namespace lve {
                 oscillator->actOnGameObject = [oldAction = move(oscillator->actOnGameObject), action = action]
                     (float sampledValue, float dt, LveGameObject& gameObject, std::unordered_map<id_t, LveGameObject>& gameObjects, std::vector<MoveEvent>& moveEvents) 
                 {
-                    action(sampledValue, gameObject);
                     oldAction(sampledValue, dt, gameObject, gameObjects, moveEvents);
+                    action(sampledValue, gameObject);
                 };
                 return *this;
             }
+
+            OscillatorComponent::Builder OscillatorComponent::Builder::ShiftBy(glm::vec3 shift) {
+                AddAction([shift=shift](float _, LveGameObject& obj) {
+                    obj.transform.translation += shift;
+                });
+
+                return *this;
+            }
+
+            // Assumes that you set a position relative to {0, 0, 0} beforehand
+            OscillatorComponent::Builder OscillatorComponent::Builder::MakeRelativeTo(id_t objId) {
+                AddAction([objId=objId]
+                (float _, float __, LveGameObject& gameObject, std::unordered_map<id_t, LveGameObject>& gameObjects, std::vector<MoveEvent>& ___){
+                    gameObject.transform.translation += gameObjects.at(objId).transform.translation;
+                });
+
+                return *this;
+            }
+
 
             OscillatorComponent::Builder OscillatorComponent::Builder::SetBounds(float min, float max) {
                 oscillator->startValue = min;
@@ -121,53 +140,22 @@ namespace lve {
                 return std::make_shared<OscillatorComponent>(*oscillator);
             }
 
-    OscillatorComponent::Builder OscillatorComponent::GetEllipticMovement(float xRadius, float zRadius) {
-        auto getPosition = [xRadius=xRadius, zRadius=zRadius](float t) {
-            return glm::vec2{
-                xRadius * std::cos(t * glm::two_pi<float>()),
-                zRadius * std::sin(t * glm::two_pi<float>())
-            };
-        };
-
-        return OscillatorComponent::Builder()
-            .SetSamplingFunctionLinear(1.f, 0.f)
-            .AddAction([getPosition=getPosition](float sampledValue, float dt, LveGameObject& obj, std::vector<MoveEvent>& moveEvents) {
-                MoveEvent event{};
-                event.objectId = obj.getId();
-
-                float tCur = sampledValue;
-                float tPrev = (tCur - dt);
-                tPrev = tPrev > 0.f
-                    ? tPrev
-                    : tPrev + 1.f;
-
-                auto prevPosition = getPosition(tPrev);
-                auto nextPosition = getPosition(tCur);
-
-                auto shift = nextPosition - prevPosition;
-                event.movement.x = shift.x;
-                event.movement.z = shift.y;
-
-                moveEvents.push_back(event);
-            });
-    }
-
-    OscillatorComponent::Builder OscillatorComponent::GetCircularMovementAroundAnObject(LveGameObject::id_t objId, float radius, float period, glm::vec3 rotation) {
+    OscillatorComponent::Builder OscillatorComponent::GetEllipticMovement(float radius1, float radius2, float period, glm::vec3 rotation) {
         auto rotationMatrix = RotationHelpers::getRotationMatrix(rotation);
         return OscillatorComponent::Builder()
             .SetSamplingFunctionLinear(1.f, 0.f)
             .SetFrequency(1.f / period)
             .ScaleSamplingFunction(glm::two_pi<float>())
-            .AddAction([objId=objId,radius=radius,rotationMatrix=rotationMatrix]
+            .AddAction([radius1=radius1,radius2=radius2,rotationMatrix=rotationMatrix]
             (float sampledValue, float dt, LveGameObject& gameObject, std::unordered_map<id_t, LveGameObject>& gameObjects, std::vector<MoveEvent>& moveEvents){
                 float angle = sampledValue;
                 auto relativePosition = glm::vec3 {
-                    std::cos(angle),
+                    std::cos(angle) * radius1,
                     0.f,
-                    std::sin(angle)
-                } * radius;
+                    std::sin(angle) * radius2
+                };
 
-                gameObject.transform.translation = gameObjects.at(objId).transform.translation + rotationMatrix * relativePosition;
+                gameObject.transform.translation = rotationMatrix * relativePosition;
             });
     }
 }
