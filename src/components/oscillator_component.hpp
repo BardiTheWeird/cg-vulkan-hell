@@ -43,6 +43,8 @@ namespace lve {
 
             Builder SetSamplingFunctionSquare(float magnitude = 1.f);
 
+            Builder SetSamplingFunctionTriangle(float magnitude, float offset);
+
             Builder SetSamplingFunctionSin(float shiftVertical, float scale);
 
             Builder AddAction(std::function<void (float, float, LveGameObject&, std::unordered_map<id_t, LveGameObject>&, std::vector<MoveEvent>&)> action);
@@ -68,5 +70,7 @@ namespace lve {
         };
 
     static Builder GetEllipticMovement(float radius1, float radius2, float period, glm::vec3 rotation = glm::vec3{0.f});
+
+    static Builder GetLinearMovement(glm::vec3 point1, glm::vec3 point2, float period);
     };
 }

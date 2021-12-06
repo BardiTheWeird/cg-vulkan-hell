@@ -49,6 +49,18 @@ namespace lve {
                 });
             }
 
+            OscillatorComponent::Builder OscillatorComponent::Builder::SetSamplingFunctionTriangle(float magnitude, float offset) {
+                return SetSamplingFunction([magnitude=magnitude, offset=offset](float t) {
+                    float res;
+                    if (t < .5f)
+                        res = t;
+                    else
+                        res = 1 - t;
+
+                    return magnitude * res + offset;
+                });
+            }
+
             OscillatorComponent::Builder OscillatorComponent::Builder::SetSamplingFunctionSin(float shiftVertical, float scale) {
                 return SetSamplingFunction([shiftVertical = shiftVertical, scale = scale](float x){ 
                     return scale * (std::sin(x * 2 * glm::pi<float>()) + shiftVertical);
@@ -116,7 +128,6 @@ namespace lve {
                 return *this;
             }
 
-
             OscillatorComponent::Builder OscillatorComponent::Builder::SetBounds(float min, float max) {
                 oscillator->startValue = min;
                 oscillator->endValue = max;
@@ -156,6 +167,23 @@ namespace lve {
                 };
 
                 gameObject.transform.translation = rotationMatrix * relativePosition;
+            });
+    }
+
+    float lerp(float a, float b, float t) {
+        return (1-t)*a + t*b;
+    }
+
+    OscillatorComponent::Builder OscillatorComponent::GetLinearMovement(glm::vec3 point1, glm::vec3 point2, float period) {
+        return OscillatorComponent::Builder()
+            .SetSamplingFunctionSin(0.f, .5f)
+            .SetFrequency(1.f / period / 2.f)
+            .AddAction([p1=point1,p2=point2](float t, LveGameObject& obj) {
+                obj.transform.translation = glm::vec3{
+                    lerp(p1.x, p2.x, t),
+                    lerp(p1.y, p2.y, t),
+                    lerp(p1.z, p2.z, t)
+                };
             });
     }
 }

@@ -270,6 +270,11 @@ namespace lve {
             mat.ignoreLighting = true;
             obj.material = mat;
 
+            obj.oscillators.push_back(
+                OscillatorComponent::GetLinearMovement({-20.f, 0.f, -20.f}, {20.f, 0.f, 20.f}, 5.f)
+                .Build()
+            );
+
             gameObjects.emplace(obj.getId(), std::move(obj));
         }
 
