@@ -3,7 +3,7 @@
 
 namespace lve {
 
-        LveGameObject::Map Scenes::loadTestScene1(LveDevice& device, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager) {
+    LveGameObject::Map Scenes::loadTestScene1(LveDevice& device, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager) {
         LveGameObject::Map gameObjects{};
 
         loadCoordinateSystem(device, gameObjects, textureManager);
@@ -217,5 +217,62 @@ namespace lve {
         gameObjects.emplace(xArrow.getId(), std::move(xArrow));
         gameObjects.emplace(yArrow.getId(), std::move(yArrow));
         gameObjects.emplace(zArrow.getId(), std::move(zArrow));
+    }
+
+    LveGameObject::Map Scenes::loadSceneLab3(LveDevice& device, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager) {
+        LveGameObject::Map gameObjects{};
+
+        textureManager.addTexture("monogatari-bw.jpg",          "monogatari-bw");
+        textureManager.addTexture("sui-chan-guitar.jpeg",       "sui-chan-guitar");
+        textureManager.addTexture("ina-smile.jpg",              "ina-smile");
+        textureManager.addTexture("ina-super-artsy.jpg",        "ina-super-artsy");
+        textureManager.addTexture("suisei-fuck-this-shit.jpg",  "suisei-fuck-this-shit");
+        textureManager.addTexture("weird-shit.jpg",             "weird-shit");
+
+        modelManager.addModel("cube-inverted-normals",     "cube-inverted-normals.obj");
+        modelManager.addModel("cube",                      "cube.obj");
+        modelManager.addModel("cube-colored",              "colored_cube.obj");
+        modelManager.addModel("sphere",                    "sphere.obj");
+        modelManager.addModel("vase-smooth",               "smooth_vase.obj");
+        modelManager.addModel("vase-flat",                 "flat_vase.obj");
+        modelManager.addModel("morning-star",              "morning-star-light-source.obj");
+        modelManager.addModel("cone",                      "cone.obj");
+
+        // skybox
+        {
+            auto obj = LveGameObject::createGameObject();
+            obj.transform.scale = glm::vec3{50.f};
+            obj.textureKey = "monogatari-bw";
+            obj.modelKey = "cube-inverted-normals";
+            
+            MaterialComponent mat{materialManager.allocateMaterial()};
+            mat.baseReflectance = 0.f;
+            mat.roughness = 1.f;
+            mat.emissivityMesh = {1.f, 1.f, 1.f, .001f};
+            // mat.ignoreLighting = true;
+            obj.material = mat;
+
+            gameObjects.emplace(obj.getId(), std::move(obj));
+        }
+
+        // light in the middle
+        {
+            auto obj = LightSource::createPoint(
+                glm::vec3{0.f},
+                30.f
+            );
+
+            obj.transform.scale = glm::vec3{2.f};
+            obj.textureKey = "monogatari-bw";
+            obj.modelKey = "morning-star";
+            
+            MaterialComponent mat{materialManager.allocateMaterial()};
+            mat.ignoreLighting = true;
+            obj.material = mat;
+
+            gameObjects.emplace(obj.getId(), std::move(obj));
+        }
+
+        return gameObjects;
     }
 }

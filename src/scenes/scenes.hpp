@@ -13,6 +13,7 @@ namespace lve {
 
     struct Scenes {
         static LveGameObject::Map loadTestScene1(LveDevice& device, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager);
+        static LveGameObject::Map loadSceneLab3(LveDevice& device, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager);
 
     private:
         static void loadCoordinateSystem(LveDevice& device, LveGameObject::Map& gameObjects, TextureManager& textureManager);

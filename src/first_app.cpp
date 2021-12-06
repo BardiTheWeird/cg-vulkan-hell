@@ -138,7 +138,9 @@ namespace lve
     }
 
     void FirstApp::loadGameObjects() {
-        gameObjects = std::move(Scenes::loadTestScene1(lveDevice, textureManager, materialManager, modelManager));
+        // gameObjects = std::move(Scenes::loadTestScene1(lveDevice, textureManager, materialManager, modelManager));
+        gameObjects = std::move(Scenes::loadSceneLab3(lveDevice, textureManager, materialManager, modelManager));
+        std::cout << "loaded " << gameObjects.size() << " game objects\n";
     }
 
     void FirstApp::getLightSources(GlobalUbo& ubo) {
