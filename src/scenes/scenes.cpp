@@ -207,21 +207,10 @@ namespace lve {
         zArrow.transform.rotation = {glm::half_pi<float>(), 0.f, 0.f};
         zArrow.textureKey = "sui-chan-guitar";
 
-        // zArrow.oscillators.push_back(
-        //     OscillatorComponent::GetEllipticMovement(.25f, 1.25f)
-        //     .SetFrequency(1.f / 4.f)
-        //     .Build()
-        // );
-
-        // zArrow.oscillators.push_back(
-        //     OscillatorComponent::GetCircularMovementAroundAnObject(gameObjects, 0, 1.f)
-        //     .SetFrequency(.25f)
-        //     .Build()
-        // );
-
-        // zArrow.circularMovementAroundObject = {0};
-
-        // zArrow.repeatMovement = {0};
+        zArrow.oscillators.push_back(
+            OscillatorComponent::GetCircularMovementAroundAnObject(0, .25f, 5.f, {0.f, 0.f, glm::quarter_pi<float>()})
+            .Build()
+        );
 
         gameObjects.emplace(origin.getId(), std::move(origin));
         gameObjects.emplace(xArrow.getId(), std::move(xArrow));

@@ -64,6 +64,6 @@ namespace lve {
 
     static Builder GetEllipticMovement(float xRadius, float zRadius);
 
-    static Builder GetCircularMovementAroundAnObject(LveGameObject::id_t objId, float radius);
+    static Builder GetCircularMovementAroundAnObject(id_t objId, float radius, float period, glm::vec3 rotation = glm::vec3{0.f});
     };
 }

@@ -1,4 +1,5 @@
 #include "oscillator_component.hpp"
+#include "../utils/helpers.hpp"
 
 namespace lve {
 
@@ -151,20 +152,22 @@ namespace lve {
             });
     }
 
-    // OscillatorComponent::Builder OscillatorComponent::GetCircularMovementAroundAnObject(LveGameObject::Map& gameObjects, LveGameObject::id_t objId, float radius) {
-    //     return Builder()
-    //         .SetSamplingFunctionLinear(1.f, 0.f)
-    //         .ScaleSamplingFunction(glm::two_pi<float>())
-    //         .AddAction([objs=gameObjects, objId=objId, radius=radius](float sampledValue, LveGameObject& obj) {
-    //             glm::vec3 relativePosition{
-    //                 std::cos(sampledValue),
-    //                 0.f,
-    //                 std::sin(sampledValue)
-    //             };
-                
-    //             relativePosition *= radius;
+    OscillatorComponent::Builder OscillatorComponent::GetCircularMovementAroundAnObject(LveGameObject::id_t objId, float radius, float period, glm::vec3 rotation) {
+        auto rotationMatrix = RotationHelpers::getRotationMatrix(rotation);
+        return OscillatorComponent::Builder()
+            .SetSamplingFunctionLinear(1.f, 0.f)
+            .SetFrequency(1.f / period)
+            .ScaleSamplingFunction(glm::two_pi<float>())
+            .AddAction([objId=objId,radius=radius,rotationMatrix=rotationMatrix]
+            (float sampledValue, float dt, LveGameObject& gameObject, std::unordered_map<id_t, LveGameObject>& gameObjects, std::vector<MoveEvent>& moveEvents){
+                float angle = sampledValue;
+                auto relativePosition = glm::vec3 {
+                    std::cos(angle),
+                    0.f,
+                    std::sin(angle)
+                } * radius;
 
-    //             obj.transform.translation = objs.at(objId).transform.translation + relativePosition;
-    //         });
-    // }
+                gameObject.transform.translation = gameObjects.at(objId).transform.translation + rotationMatrix * relativePosition;
+            });
+    }
 }
