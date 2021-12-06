@@ -8,6 +8,7 @@
 #include "components/material_component.hpp"
 #include "components/repeat_movement_component.hpp"
 #include "components/oscillator_component.hpp"
+#include "components/circular_movement_around_object_component.hpp"
 
 // std
 #include <memory>
@@ -51,6 +52,7 @@ namespace lve
         std::optional<CircularMovementComponent> circularMovement = std::nullopt;
         std::optional<RepeatMovementComponent> repeatMovement = std::nullopt;
         std::vector<std::shared_ptr<OscillatorComponent>> oscillators{};
+        std::optional<CircularMovementAroundObjectComponent> circularMovementAroundObject = std::nullopt;
 
     private:
         LveGameObject(id_t objId) : id{objId} {};

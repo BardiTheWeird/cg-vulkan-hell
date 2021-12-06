@@ -78,6 +78,7 @@ namespace lve {
     void GameSystemManager::executeAll(FrameInfo& frameInfo) {
         enactVelocityAcceleration(frameInfo);
         moveCircle(frameInfo);
+        moveCircleAroundObject(frameInfo);
 
         enactRepeatMovement(frameInfo);
         applyMoveEvents(frameInfo);
@@ -132,11 +133,34 @@ namespace lve {
         }
     }
 
+    void GameSystemManager::moveCircleAroundObject(FrameInfo& frameInfo) {
+        for (auto& kv : frameInfo.gameObjects) {
+            auto& obj = kv.second;
+            if (!obj.circularMovementAroundObject.has_value())
+                continue;
+
+            auto circ = obj.circularMovementAroundObject;
+            auto center = frameInfo.gameObjects.at(circ->objectId).transform.translation;
+            auto rotation = circ->rotation * circ->speed * frameInfo.frameTime;
+
+            auto curPos = obj.transform.translation;
+            auto newPos = 
+                RotationHelpers::getRotationMatrix(rotation) 
+                * (curPos - center)
+                + center;
+
+            moveEvents.push_back({
+                obj.getId(),
+                newPos - curPos
+            });
+        }
+    }
+
     void GameSystemManager::advanceOscillators(FrameInfo& frameInfo) {
         for (auto& kv: frameInfo.gameObjects) {
             auto& obj = kv.second;
             for (auto& oscillator: obj.oscillators) {
-                oscillator->advance(frameInfo.frameTime, obj, moveEvents);
+                oscillator->advance(frameInfo.frameTime, obj, frameInfo.gameObjects, moveEvents);
             }
         }
     }

@@ -68,15 +68,15 @@ namespace lve {
         smoothVase.textureKey = "sui-chan-guitar";
         smoothVase.material = {{ materialManager.allocateMaterial() }};
 
-        auto ellipsisOscillator = std::make_shared<OscillatorComponent>();
-        ellipsisOscillator->frequency = 1.f / 4.f;
-        ellipsisOscillator->actOnGameObject = [](float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
-            float t = (sampledValue + 1.f) / 2.f;
-            gameObject.transform.translation.x = t * 2;
-            gameObject.transform.translation.z = t * 4;
-        };
+        // auto ellipsisOscillator = std::make_shared<OscillatorComponent>();
+        // ellipsisOscillator->frequency = 1.f / 4.f;
+        // ellipsisOscillator->actOnGameObject = [](float sampledValue, float frameTime, LveGameObject& gameObject, std::vector<MoveEvent>& moveEvents) {
+        //     float t = (sampledValue + 1.f) / 2.f;
+        //     gameObject.transform.translation.x = t * 2;
+        //     gameObject.transform.translation.z = t * 4;
+        // };
 
-        smoothVase.oscillators.push_back(ellipsisOscillator);
+        smoothVase.oscillators.push_back(OscillatorComponent::GetLinearMovement({2.f, 0.f, 4.f}, 1).Build());
 
         gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
@@ -223,7 +223,15 @@ namespace lve {
         //     .Build()
         // );
 
-        zArrow.repeatMovement = {0};
+        // zArrow.oscillators.push_back(
+        //     OscillatorComponent::GetCircularMovementAroundAnObject(gameObjects, 0, 1.f)
+        //     .SetFrequency(.25f)
+        //     .Build()
+        // );
+
+        // zArrow.circularMovementAroundObject = {0};
+
+        // zArrow.repeatMovement = {0};
 
         gameObjects.emplace(origin.getId(), std::move(origin));
         gameObjects.emplace(xArrow.getId(), std::move(xArrow));
