@@ -1,5 +1,6 @@
 #include "scenes.hpp"
 #include "../components/oscillator_component.hpp"
+#include "../utils/helpers.hpp"
 
 namespace lve {
 
@@ -219,15 +220,23 @@ namespace lve {
         gameObjects.emplace(zArrow.getId(), std::move(zArrow));
     }
 
+    glm::vec3 colorYellow{1.f, 1.f, 25.f/255.f};
+    glm::vec3 colorBlue{102.f/255.f,204.f/255.f,255.f/255.f};
+    glm::vec3 colorRosewood{128.f/255.f,21.f/255.f,0.f/255.f};
+    glm::vec3 colorTopaz{255.f/255.f,191.f/255.f,128.f/255.f};
+
     LveGameObject::Map Scenes::loadSceneLab3(LveDevice& device, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager) {
         LveGameObject::Map gameObjects{};
 
-        textureManager.addTexture("monogatari-bw.jpg",          "monogatari-bw");
-        textureManager.addTexture("sui-chan-guitar.jpeg",       "sui-chan-guitar");
-        textureManager.addTexture("ina-smile.jpg",              "ina-smile");
-        textureManager.addTexture("ina-super-artsy.jpg",        "ina-super-artsy");
-        textureManager.addTexture("suisei-fuck-this-shit.jpg",  "suisei-fuck-this-shit");
-        textureManager.addTexture("weird-shit.jpg",             "weird-shit");
+        textureManager.addTexture("art/monogatari-bw.jpg",          "monogatari-bw");
+        textureManager.addTexture("art/sui-chan-guitar.jpeg",       "sui-chan-guitar");
+        textureManager.addTexture("art/ina-smile.jpg",              "ina-smile");
+        textureManager.addTexture("art/ina-super-artsy.jpg",        "ina-super-artsy");
+        textureManager.addTexture("art/suisei-fuck-this-shit.jpg",  "suisei-fuck-this-shit");
+        textureManager.addTexture("textural/weird-shit.jpg",        "weird-shit");
+
+        textureManager.addTexture("planets/Gaseous3.png",           "gaseous1");
+        textureManager.addTexture("planets/Icy.png",           "icy");
 
         modelManager.addModel("cube-inverted-normals",     "cube-inverted-normals.obj");
         modelManager.addModel("cube",                      "cube.obj");
@@ -237,12 +246,14 @@ namespace lve {
         modelManager.addModel("vase-flat",                 "flat_vase.obj");
         modelManager.addModel("morning-star",              "morning-star-light-source.obj");
         modelManager.addModel("cone",                      "cone.obj");
+        // modelManager.addModel("3k-poly-sphere",                "3k-poly-sphere.obj");
+        modelManager.addModel("smooth-sphere",                "smooth-sphere.obj");
 
         // skybox
         {
             auto obj = LveGameObject::createGameObject();
             obj.transform.scale = glm::vec3{50.f};
-            obj.textureKey = "monogatari-bw";
+            obj.textureKey = "suisei-fuck-this-shit";
             obj.modelKey = "cube-inverted-normals";
             
             MaterialComponent mat{materialManager.allocateMaterial()};
@@ -252,26 +263,131 @@ namespace lve {
             // mat.ignoreLighting = true;
             obj.material = mat;
 
-            gameObjects.emplace(obj.getId(), std::move(obj));
+            // gameObjects.emplace(obj.getId(), std::move(obj));
         }
 
         // light in the middle
         {
             auto obj = LightSource::createPoint(
                 glm::vec3{0.f},
-                30.f
+                30.f,
+                glm::vec4{1.f, 1.f, 25.f/255.f, 1.f}
             );
 
-            obj.transform.scale = glm::vec3{2.f};
-            obj.textureKey = "monogatari-bw";
+            obj.transform.scale = glm::vec3{.8f};
+            obj.textureKey = "sui-chan-guitar";
             obj.modelKey = "morning-star";
             
             MaterialComponent mat{materialManager.allocateMaterial()};
-            mat.ignoreLighting = true;
+            mat.lightingToColor = .4f;
+            obj.material = mat;
+
+            VelocityAccelerationComponent va{};
+            va.rotationVelocity = glm::vec3{0.f, -.1f, .1f};
+            obj.velocityAcceleration = va;
+
+            obj.oscillators.push_back(
+                OscillatorComponent::Builder()
+                    .SetFrequency(1.f/32.f)
+                    .AddAction([](float t, LveGameObject& obj) {
+                        glm::vec3 color{MathHelpers::lerp(colorYellow, colorBlue, t * .8f + .1f)};
+                        obj.lightSource.value().color = {color, 1.f};
+                        obj.material.value().emissivityMesh = {color, .01f};
+                        obj.material.value().updatedThisFrame = true;
+                    })
+                    .Build()
+            );
+
+            gameObjects.emplace(obj.getId(), std::move(obj));
+        }
+
+        // second light around the middle
+        {
+            auto obj = LightSource::createPoint(
+                glm::vec3{0.f},
+                30.f,
+                glm::vec4{1.f, 1.f, 25.f/255.f, 1.f}
+            );
+
+            obj.transform.scale = glm::vec3{0.25f};
+            obj.textureKey = "weird-shit";
+            obj.modelKey = "morning-star";
+            
+            MaterialComponent mat{materialManager.allocateMaterial()};
+            obj.material = mat;
+            mat.lightingToColor = 0.f;
+
+            VelocityAccelerationComponent va{};
+            va.rotationVelocity = glm::vec3{0.f, .3f, -.1f};
+            obj.velocityAcceleration = va;
+
+            obj.oscillators.push_back(
+                OscillatorComponent::GetEllipticMovement(5.f, 4.f, 8.f, glm::vec3{0.f, glm::quarter_pi<float>(), glm::quarter_pi<float>()})
+                .Build()
+            );
+
+            obj.oscillators.push_back(
+                OscillatorComponent::Builder()
+                    .SetFrequency(1.f/16.f)
+                    .AddAction([](float t, LveGameObject& obj) {
+                        glm::vec3 color{MathHelpers::lerp(colorRosewood, colorTopaz, t * .8f + .1f)};
+                        obj.lightSource.value().color = {color, 1.f};
+                        obj.material.value().emissivityMesh = {color, .1f};
+                        obj.material.value().updatedThisFrame = true;
+                    })
+                    .Build()
+            );
+
+            gameObjects.emplace(obj.getId(), std::move(obj));
+        }
+
+        // planet 1
+        {
+            auto obj = LveGameObject::createGameObject();
+            obj.transform.scale = glm::vec3{1.f, .9f, 1.f};
+            obj.modelKey = "smooth-sphere";
+            obj.textureKey = "gaseous1";
+
+            MaterialComponent mat{};
+            mat.material_id = materialManager.allocateMaterial();
+            mat.metallicCoefficient = 0.f;
+            mat.lightingToColor = .01f;
+
+            VelocityAccelerationComponent va{};
+            va.rotationVelocity = glm::vec3{0.f, -0.3490658504f, 0.f};
+            obj.velocityAcceleration = va;
+
             obj.material = mat;
 
             obj.oscillators.push_back(
-                OscillatorComponent::GetLinearMovement({-20.f, 0.f, -20.f}, {20.f, 0.f, 20.f}, 5.f)
+                OscillatorComponent::GetEllipticMovement(15.f, 10.f, 32.f/*, glm::vec3{-glm::quarter_pi<float>(), 0.f, glm::quarter_pi<float>()}*/)
+                .Build()
+            );
+
+            gameObjects.emplace(obj.getId(), std::move(obj));
+        }
+
+        // satellite of planet  1
+        {
+            auto obj = LveGameObject::createGameObject();
+            obj.transform.scale = glm::vec3{.25f};
+            obj.modelKey = "smooth-sphere";
+            obj.textureKey = "icy";
+
+            MaterialComponent mat{};
+            mat.material_id = materialManager.allocateMaterial();
+            mat.metallicCoefficient = 0.f;
+            mat.lightingToColor = .01f;
+
+            VelocityAccelerationComponent va{};
+            va.rotationVelocity = glm::vec3{0.f, 0.12f, 0.f};
+            obj.velocityAcceleration = va;
+
+            obj.material = mat;
+
+            obj.oscillators.push_back(
+                OscillatorComponent::GetEllipticMovement(2.f, 2.8f, 8.f, glm::vec3{-glm::quarter_pi<float>(), 0.f, glm::quarter_pi<float>()})
+                .MakeRelativeTo(3)
                 .Build()
             );
 

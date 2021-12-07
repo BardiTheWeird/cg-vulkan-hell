@@ -33,5 +33,15 @@ namespace lve {
             };
         }
     };
+
+    struct MathHelpers {
+        static float lerp(float a, float b, float t) {
+            return (1-t)*a + t*b;
+        }
+
+        static glm::vec3 lerp(glm::vec3 a, glm::vec3 b, float t) {
+            return (1-t)*a + t*b;
+        }
+    };
     
 }

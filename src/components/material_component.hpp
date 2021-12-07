@@ -15,10 +15,10 @@ namespace lve {
         float albedoMesh{2.0};
         float baseReflectance{0.3};
         float roughness{0.1};
-        float metallicCoefficient{0.0};
+        float metallicCoefficient{.5f};
         glm::vec4 emissivityMesh{0.0};
 
-        bool ignoreLighting;
+        float lightingToColor{0.f};
 
         bool updatedThisFrame{true};
     };

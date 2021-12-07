@@ -46,7 +46,7 @@ layout (set = 1, binding = 0) uniform sampler2D tex1;
 layout (set = 2, binding = 0) uniform MaterialUbo {
     vec4 albedoReflectanceRoughnessMetallic; // albedo at .x; reflectance at .y; roughness at w; metallic at .w
     vec4 emissivityMesh; // .w is brightness
-    ivec4 parameters; // .x is ignoreLighting; .yzw are empty
+    vec4 parameters; // .x is lightingToColor; .yzw are empty
 } material;
 
 layout(push_constant) uniform Push {
@@ -84,7 +84,7 @@ vec3 F(vec3 F0, vec3 V, vec3 H) {
     return F0 + (vec3(1.0) - F0) * pow(1 - max(dot(V, H), 0.0), 5.0);
 }
 
-vec3 PBR(vec3 N, vec3 V, vec3 L, vec3 H, vec3 F0, vec3 albedo, float alpha, vec3 lightColor, vec3 meshColor) {
+vec3 PBR(vec3 N, vec3 V, vec3 L, vec3 H, vec3 F0, vec3 albedo, float alpha, vec3 lightColor, vec3 meshColor, float metallicCoefficient) {
     vec3 Ks = F(F0, V, H);
     vec3 Kd = vec3(1.0) - Ks;
 
@@ -95,7 +95,7 @@ vec3 PBR(vec3 N, vec3 V, vec3 L, vec3 H, vec3 F0, vec3 albedo, float alpha, vec3
     cookTorranceDenominator = max(cookTorranceDenominator, 0.000001);
     vec3 cookTorrance = cookTorranceNumerator / cookTorranceDenominator;
 
-    vec3 BRDF = Kd * lambert * meshColor + cookTorrance;
+    vec3 BRDF = (1 - metallicCoefficient) * (Kd * lambert * meshColor) + metallicCoefficient * cookTorrance;
     vec3 outgoingLight = BRDF * lightColor * max(dot(L, N), 0.0);
 
     return outgoingLight;
@@ -142,6 +142,7 @@ void main() {
     float roughness = material.albedoReflectanceRoughnessMetallic.z;
     float metallicCoefficient = material.albedoReflectanceRoughnessMetallic.w;
     vec3 emissivity = material.emissivityMesh.xyz * material.emissivityMesh.w;
+    float lightingToColor = material.parameters.x;
 
     vec3 meshColor = texture(tex1, texCoord).xyz;
 
@@ -176,12 +177,13 @@ void main() {
         L = normalize(L);
         vec3 H = normalize(V + L);
 
-        vec3 PBR_PER_LIGHT = PBR(N, V, L, H, baseReflectance, albedo, alpha, lightColor, meshColor);
+        vec3 PBR_PER_LIGHT = PBR(N, V, L, H, baseReflectance, albedo, alpha, lightColor, meshColor, metallicCoefficient);
         PBR_SUM = PBR_SUM + PBR_PER_LIGHT;
     }
 
     vec3 ambientLight = ubo.ambientColor.xyz * ubo.ambientColor.w;
     vec3 raw_ish_color = emissivity + PBR_SUM + ambientLight;
+    vec3 lerped = lightingToColor * meshColor + (1 - lightingToColor) * raw_ish_color;
 
-    outColor = vec4(PostProcessing(raw_ish_color), 1.0);
+    outColor = vec4(PostProcessing(lerped), 1.0);
 }

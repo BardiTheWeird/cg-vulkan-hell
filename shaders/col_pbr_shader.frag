@@ -43,7 +43,7 @@ layout (set = 0, binding = 0) uniform GlobalUbo {
 layout (set = 1, binding = 0) uniform MaterialUbo {
     vec4 albedoReflectanceRoughnessMetallic; // albedo at .x; reflectance at .y; roughness at w; metallic at .w
     vec4 emissivityMesh; // .w is brightness
-    ivec4 parameters; // .x is ignoreLighting; .yzw are empty
+    vec4 parameters; // .x is lightingToColor; .yzw are empty
 } material;
 
 layout(push_constant) uniform Push {
@@ -129,16 +129,12 @@ vec3 PostProcessing(vec3 inColor) {
 }
 
 void main() {
-    if (material.parameters.x == 1) {
-        outColor = vec4(fragColor, 1.0);
-        return;
-    }
-
     vec3 albedo = vec3(material.albedoReflectanceRoughnessMetallic.x);
     vec3 baseReflectance = vec3(material.albedoReflectanceRoughnessMetallic.y);
     float roughness = material.albedoReflectanceRoughnessMetallic.z;
     float metallicCoefficient = material.albedoReflectanceRoughnessMetallic.w;
     vec3 emissivity = material.emissivityMesh.xyz * material.emissivityMesh.w;
+    float lightingToColor = material.parameters.x;
 
     vec3 meshColor = fragColor;
 
@@ -179,6 +175,7 @@ void main() {
 
     vec3 ambientLight = ubo.ambientColor.xyz * ubo.ambientColor.w;
     vec3 raw_ish_color = emissivity + PBR_SUM + ambientLight;
+    vec3 lerped = lightingToColor * meshColor + (1 - lightingToColor) * raw_ish_color;
 
-    outColor = vec4(PostProcessing(raw_ish_color), 1.0);
+    outColor = vec4(PostProcessing(lerped), 1.0);
 }

@@ -170,20 +170,12 @@ namespace lve {
             });
     }
 
-    float lerp(float a, float b, float t) {
-        return (1-t)*a + t*b;
-    }
-
     OscillatorComponent::Builder OscillatorComponent::GetLinearMovement(glm::vec3 point1, glm::vec3 point2, float period) {
         return OscillatorComponent::Builder()
             .SetSamplingFunctionSin(0.f, .5f)
             .SetFrequency(1.f / period / 2.f)
             .AddAction([p1=point1,p2=point2](float t, LveGameObject& obj) {
-                obj.transform.translation = glm::vec3{
-                    lerp(p1.x, p2.x, t),
-                    lerp(p1.y, p2.y, t),
-                    lerp(p1.z, p2.z, t)
-                };
+                obj.transform.translation = MathHelpers::lerp(p1, p2, t);
             });
     }
 }
