@@ -69,5 +69,6 @@ namespace lve {
         std::unique_ptr<LveDescriptorSetLayout> globalSetLayout;
 
         LveGameObject::Map gameObjects;
+        LveGameObject cameraObject = LveGameObject::createGameObject();
     };
 }

@@ -40,4 +40,17 @@ namespace lve {
             currentMoveSpeed = 0.f;
         }
     }
+
+    bool KeyboardMovementController::shouldSwitchProjection(GLFWwindow* window) {
+        static bool pressed = false;
+        if (pressed && glfwGetKey(window, keys.switchProjections) != GLFW_PRESS) {
+            pressed = false;
+            return true;
+        }
+        if (!pressed && glfwGetKey(window, keys.switchProjections) == GLFW_PRESS) {
+            pressed = true;
+        }
+
+        return false;
+    }
 }

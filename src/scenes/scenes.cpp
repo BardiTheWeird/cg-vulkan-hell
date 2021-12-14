@@ -4,7 +4,7 @@
 
 namespace lve {
 
-    LveGameObject::Map Scenes::loadTestScene1(LveDevice& device, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager) {
+    LveGameObject::Map Scenes::loadTestScene1(LveDevice& device, LveGameObject& cameraObject, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager) {
         LveGameObject::Map gameObjects{};
 
         loadCoordinateSystem(device, gameObjects, textureManager);
@@ -220,8 +220,10 @@ namespace lve {
         gameObjects.emplace(zArrow.getId(), std::move(zArrow));
     }
 
-    LveGameObject::Map Scenes::loadSceneLab1(LveDevice& device, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager) {
+    LveGameObject::Map Scenes::loadSceneLab1(LveDevice& device, LveGameObject& cameraObject, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager) {
         LveGameObject::Map gameObjects{};
+
+        cameraObject.transform.translation = {4.265016, 4.973695, -6.969042};
 
         std::vector<LveModel::Vertex> vertices{
             {{2.2391857506361323f, 2.1119592875318065f, 0.f}},
@@ -288,8 +290,11 @@ namespace lve {
     glm::vec3 colorRosewood{128.f/255.f,21.f/255.f,0.f/255.f};
     glm::vec3 colorTopaz{255.f/255.f,191.f/255.f,128.f/255.f};
 
-    LveGameObject::Map Scenes::loadSceneLab3(LveDevice& device, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager) {
+    LveGameObject::Map Scenes::loadSceneLab3(LveDevice& device, LveGameObject& cameraObject, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager) {
         LveGameObject::Map gameObjects{};
+
+        cameraObject.transform.translation = {0.f, -20.f, -20.f};
+        cameraObject.transform.rotation = {-0.774061f, 6.15869f, 0.f};
 
         textureManager.addTexture("art/monogatari-bw.jpg",          "monogatari-bw");
         textureManager.addTexture("art/sui-chan-guitar.jpeg",       "sui-chan-guitar");

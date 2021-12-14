@@ -2,6 +2,7 @@
 
 #include "lve_game_object.hpp"
 #include "lve_window.hpp"
+#include "lve_camera.hpp"
 
 namespace lve {
 
@@ -18,9 +19,11 @@ namespace lve {
             int lookRight = GLFW_KEY_RIGHT;
             int lookUp = GLFW_KEY_UP;
             int lookDown = GLFW_KEY_DOWN;
+            int switchProjections = GLFW_KEY_P;
         };
 
         void moveInPlaneXZ(GLFWwindow* window, float dt, LveGameObject& gameObject);
+        bool shouldSwitchProjection(GLFWwindow* window);
 
         KeyMappings keys{};
         float moveSpeed{3.f};

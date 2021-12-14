@@ -85,10 +85,6 @@ namespace lve
         }
 
         LveCamera camera{};
-
-        auto viewerObject = LveGameObject::createGameObject();
-        viewerObject.transform.translation = {0.f, -20.f, -20.f};
-        viewerObject.transform.rotation = {-0.774061f, 6.15869f, 0.f};
         KeyboardMovementController cameraController{};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -101,11 +97,21 @@ namespace lve
             currentTime = newTime;
 
             // camera settings
-            cameraController.moveInPlaneXZ(lveWindow.getGlfwWindow(), frameTime, viewerObject);
-            camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
+            static bool isPerspective = true;
+            if (cameraController.shouldSwitchProjection(lveWindow.getGlfwWindow()))
+                isPerspective = !isPerspective;
 
             float aspect = lveRenderer.getAspectRatio();
-            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 500.f);
+            if (isPerspective) {
+                camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 500.f);
+            }
+            else {
+                auto height = 8.f;
+                auto halfHeight = height / 2.f;
+                camera.setOrthographicProjection(-aspect * halfHeight, aspect * halfHeight, -halfHeight, halfHeight, -1.f, 10.f);
+            }
+            camera.setViewYXZ(cameraObject.transform.translation, cameraObject.transform.rotation);
+            cameraController.moveInPlaneXZ(lveWindow.getGlfwWindow(), frameTime, cameraObject);
 
             if (auto commandBuffer = lveRenderer.beginFrame()) {
                 int frameIndex = lveRenderer.getFrameIndex();
@@ -121,7 +127,7 @@ namespace lve
                 // update
                 GlobalUbo ubo{};
                 ubo.projectionView = camera.getProjectionMatrix() * camera.getViewMatrix();
-                ubo.cameraPosition = {viewerObject.transform.translation, 0.f};
+                ubo.cameraPosition = {cameraObject.transform.translation, 0.f};
 
                 getLightSources(ubo);
 
@@ -140,10 +146,8 @@ namespace lve
     }
 
     void FirstApp::loadGameObjects(int argc, char** argv) {
-        std::function<LveGameObject::Map (LveDevice&, TextureManager&, MaterialManager&, ModelManager&)> sceneLoaderFunction = nullptr;
-        printf("argc = %d\n", argc);
+        std::function<LveGameObject::Map (LveDevice&, LveGameObject&, TextureManager&, MaterialManager&, ModelManager&)> sceneLoaderFunction = nullptr;
         if (argc > 1) {
-            printf("argv[1] = %s\n", argv[1]);
             if (!strcmp(argv[1], "lab1")) {
                 sceneLoaderFunction = Scenes::loadSceneLab1;
             }
@@ -155,7 +159,7 @@ namespace lve
         if (sceneLoaderFunction == nullptr) {
             sceneLoaderFunction = Scenes::loadTestScene1;
         }
-        gameObjects = sceneLoaderFunction(lveDevice, textureManager, materialManager, modelManager);
+        gameObjects = sceneLoaderFunction(lveDevice, cameraObject, textureManager, materialManager, modelManager);
         std::cout << "loaded " << gameObjects.size() << " game objects\n";
     }
 
