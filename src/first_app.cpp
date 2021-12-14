@@ -103,12 +103,12 @@ namespace lve
 
             float aspect = lveRenderer.getAspectRatio();
             if (isPerspective) {
-                camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 500.f);
+                camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 1000.f);
             }
             else {
                 auto height = 8.f;
                 auto halfHeight = height / 2.f;
-                camera.setOrthographicProjection(-aspect * halfHeight, aspect * halfHeight, -halfHeight, halfHeight, -1.f, 10.f);
+                camera.setOrthographicProjection(-aspect * halfHeight, aspect * halfHeight, -halfHeight, halfHeight, -1.f, 1000.f);
             }
             camera.setViewYXZ(cameraObject.transform.translation, cameraObject.transform.rotation);
             cameraController.moveInPlaneXZ(lveWindow.getGlfwWindow(), frameTime, cameraObject);
@@ -128,6 +128,8 @@ namespace lve
                 GlobalUbo ubo{};
                 ubo.projectionView = camera.getProjectionMatrix() * camera.getViewMatrix();
                 ubo.cameraPosition = {cameraObject.transform.translation, 0.f};
+
+                // printf("camera position: %f\t%f\t%f\t\n", ubo.cameraPosition.x, ubo.cameraPosition.y, ubo.cameraPosition.z);
 
                 getLightSources(ubo);
 
