@@ -9,11 +9,11 @@ namespace lve {
 
         loadCoordinateSystem(device, gameObjects, textureManager);
 
-        textureManager.addTexture("sui-chan-guitar.jpeg", "sui-chan-guitar");
-        textureManager.addTexture("ina-smile.jpg", "ina-smile");
-        textureManager.addTexture("ina-super-artsy.jpg", "ina-super-artsy");
-        textureManager.addTexture("suisei-fuck-this-shit.jpg", "suisei-fuck-this-shit");
-        textureManager.addTexture("weird-shit.jpg", "weird-shit");
+        textureManager.addTexture("art/sui-chan-guitar.jpeg", "sui-chan-guitar");
+        textureManager.addTexture("art/ina-smile.jpg", "ina-smile");
+        textureManager.addTexture("art/ina-super-artsy.jpg", "ina-super-artsy");
+        textureManager.addTexture("art/suisei-fuck-this-shit.jpg", "suisei-fuck-this-shit");
+        textureManager.addTexture("textural/weird-shit.jpg", "weird-shit");
 
         modelManager.addModel("cube-inverted-normals", "cube-inverted-normals.obj");
         modelManager.addModel("cube", "cube.obj");
@@ -218,6 +218,69 @@ namespace lve {
         gameObjects.emplace(xArrow.getId(), std::move(xArrow));
         gameObjects.emplace(yArrow.getId(), std::move(yArrow));
         gameObjects.emplace(zArrow.getId(), std::move(zArrow));
+    }
+
+    LveGameObject::Map Scenes::loadSceneLab1(LveDevice& device, TextureManager& textureManager, MaterialManager& materialManager, ModelManager& modelManager) {
+        LveGameObject::Map gameObjects{};
+
+        std::vector<LveModel::Vertex> vertices{
+            {{2.2391857506361323f, 2.1119592875318065f, 0.f}},
+            {{1.2213740458015268f, 3.1297709923664123f, 0.f}},
+            {{2.2391857506361323f, 3.1297709923664123f, 0.f}},
+            {{2.2391857506361323f, 4.580152671755725f, 0.f}},
+            {{2.2391857506361323f, 5.2926208651399484f, 0.f}},
+            {{3.3587786259541987f, 5.2926208651399484f, 0.f}},
+            {{4.402035623409669f, 5.2926208651399484f, 0.f}},
+            {{4.885496183206107f, 5.2926208651399484f, 0.f}},
+            {{1.5012722646310435f, 5.318066157760814f, 0.f}},
+            {{2.2391857506361323f, 6.0559796437659035f, 0.f}},
+            {{2.595419847328244f, 6.0559796437659035f, 0.f}},
+            {{4.096692111959287f, 6.0559796437659035f, 0.f}},
+            {{3.333333333333333f, 6.793893129770993f, 0.f}},
+            {{4.885496183206107f, 6.819338422391858f, 0.f}},
+            {{6.3867684478371505f, 6.819338422391858f, 0.f}},
+            {{7.150127226463105f, 7.531806615776081f, 0.f}},
+            {{2.6208651399491094f, 7.557251908396947f, 0.f}},
+            {{5.597964376590331f, 7.557251908396947f, 0.f}}
+        };
+
+        for (auto& v: vertices)
+            v.color = {252.f/255.f, 253.f/255.f, 1.f/255.f};
+
+        std::vector<uint32_t> indices{
+            0, 1, 2,
+            2, 5, 7,
+            3, 4, 9,
+            6, 10, 11,
+            10, 11, 12,
+            6, 8, 13,
+            11, 15, 16,
+            13, 14, 16,
+            16, 14, 17
+        };
+
+        std::shared_ptr<LveModel> model = std::make_shared<LveModel>(
+            device,
+            LveModel::Data{
+                vertices,
+                indices
+            }
+        );
+
+        modelManager.addModel("is this a kangaroo?", model);
+
+        auto obj = LveGameObject::createGameObject();
+        obj.modelKey = "is this a kangaroo?";
+
+        MaterialComponent material{
+            materialManager.allocateMaterial()
+        };
+        material.lightingToColor = 1.f;
+        obj.material = material;
+
+        gameObjects.emplace(obj.getId(), std::move(obj));
+
+        return gameObjects;
     }
 
     glm::vec3 colorYellow{1.f, 1.f, 25.f/255.f};

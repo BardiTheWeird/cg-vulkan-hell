@@ -16,8 +16,12 @@ namespace lve {
 
         ModelManager(LveDevice& lveDevice) : lveDevice{lveDevice} {}
 
+        void addModel(std::string key, std::shared_ptr<LveModel> model) {
+            modelMap.insert_or_assign(key, model);
+        }
+
         void addModel(std::string key, std::string filepath) {
-            modelMap.insert_or_assign(key, LveModel::createModelFromFile(lveDevice, filepath));
+            addModel(key, LveModel::createModelFromFile(lveDevice, filepath));
         }
 
         const std::optional<std::shared_ptr<LveModel>> getModel(std::string key) const {

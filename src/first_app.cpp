@@ -19,10 +19,11 @@
 #include <array>
 #include <queue>
 #include <iostream>
+#include <string.h>
 
 namespace lve
 {
-    FirstApp::FirstApp()
+    FirstApp::FirstApp(int argc, char** argv)
     {
         globalSetLayout = LveDescriptorSetLayout::Builder(lveDevice)
             .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
@@ -51,7 +52,7 @@ namespace lve
             modelManager
         );
 
-        loadGameObjects();
+        loadGameObjects(argc, argv);
 
         gameSystemManager = std::make_unique<GameSystemManager>(
             lveDevice,
@@ -138,9 +139,23 @@ namespace lve
     vkDeviceWaitIdle(lveDevice.device());
     }
 
-    void FirstApp::loadGameObjects() {
-        // gameObjects = std::move(Scenes::loadTestScene1(lveDevice, textureManager, materialManager, modelManager));
-        gameObjects = std::move(Scenes::loadSceneLab3(lveDevice, textureManager, materialManager, modelManager));
+    void FirstApp::loadGameObjects(int argc, char** argv) {
+        std::function<LveGameObject::Map (LveDevice&, TextureManager&, MaterialManager&, ModelManager&)> sceneLoaderFunction = nullptr;
+        printf("argc = %d\n", argc);
+        if (argc > 1) {
+            printf("argv[1] = %s\n", argv[1]);
+            if (!strcmp(argv[1], "lab1")) {
+                sceneLoaderFunction = Scenes::loadSceneLab1;
+            }
+            else if (!strcmp(argv[1], "lab3")) {
+                sceneLoaderFunction = Scenes::loadSceneLab3;
+            }
+        }
+
+        if (sceneLoaderFunction == nullptr) {
+            sceneLoaderFunction = Scenes::loadTestScene1;
+        }
+        gameObjects = sceneLoaderFunction(lveDevice, textureManager, materialManager, modelManager);
         std::cout << "loaded " << gameObjects.size() << " game objects\n";
     }
 

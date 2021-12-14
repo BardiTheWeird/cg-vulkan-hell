@@ -14,11 +14,11 @@ void ErrorCallback(int, const char* err_str)
     std::cout << "GLFW Error: " << err_str << std::endl;
 }
 
-int main() {
+int main(int argc, char** argv) {
     // Register error callback first
     glfwSetErrorCallback(ErrorCallback);
 
-    lve::FirstApp app{};
+    lve::FirstApp app{argc, argv};
 
     try {
         app.run();

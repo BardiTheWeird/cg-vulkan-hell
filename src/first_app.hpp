@@ -40,7 +40,7 @@ namespace lve {
         static constexpr int WIDTH = 800;
         static constexpr int HEIGHT = 600;
 
-        FirstApp();
+        FirstApp(int argc, char** argv);
         ~FirstApp();
 
         FirstApp(const FirstApp&) = delete;
@@ -50,7 +50,7 @@ namespace lve {
         void run();
 
     private:
-        void loadGameObjects();
+        void loadGameObjects(int argc, char** argv);
         void getLightSources(GlobalUbo& ubo);
         void moveOnSchedule(float frameTime);
 
