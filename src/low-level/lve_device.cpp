@@ -1,4 +1,5 @@
 #include "lve_device.hpp"
+#include "../utils/helpers.hpp"
 
 // libs
 #include <stb_image.h>
@@ -126,12 +127,34 @@ void LveDevice::pickPhysicalDevice() {
   std::vector<VkPhysicalDevice> devices(deviceCount);
   vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
-  for (const auto &device : devices) {
-    if (isDeviceSuitable(device)) {
-      physicalDevice = device;
-      break;
-    }
+  std::cout << "Choose device:\n" ;
+  for (int i = 0; i < deviceCount; i++) {
+    auto device = devices[i];
+    VkPhysicalDeviceProperties deviceProperties{};
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+    
+    printf("%d) %s\n", i + 1, deviceProperties.deviceName);
   }
+
+  int choice = -1;
+  do {
+    std::string line;
+    std::getline(std::cin, line);
+
+    int parsed_choice;
+    StringHelpers::STR2INT_ERROR result = StringHelpers::str2int(parsed_choice, line.c_str());
+    if (result != StringHelpers::SUCCESS) {
+      std::cout << "Failed parsing the choice\n";
+      continue;
+    }
+    else if (parsed_choice < 1 || parsed_choice > deviceCount) {
+      std::cout << "choice out of bounds\n";
+      continue;
+    }
+    choice = parsed_choice;
+  } while(choice == -1);
+
+  physicalDevice = devices[choice - 1];
 
   if (physicalDevice == VK_NULL_HANDLE) {
     throw std::runtime_error("failed to find a suitable GPU!");

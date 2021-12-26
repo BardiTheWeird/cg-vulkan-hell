@@ -2,6 +2,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <climits>
+
 namespace lve {
 
     struct RotationHelpers
@@ -44,4 +46,26 @@ namespace lve {
         }
     };
     
+    struct StringHelpers {
+        enum STR2INT_ERROR { SUCCESS, OVERFLOW, UNDERFLOW, INCONVERTIBLE };
+
+        static STR2INT_ERROR str2int (int &i, char const *s, int base = 0)
+        {
+            char *end;
+            long  l;
+            errno = 0;
+            l = strtol(s, &end, base);
+            if ((errno == ERANGE && l == LONG_MAX) || l > INT_MAX) {
+                return OVERFLOW;
+            }
+            if ((errno == ERANGE && l == LONG_MIN) || l < INT_MIN) {
+                return UNDERFLOW;
+            }
+            if (*s == '\0' || *end != '\0') {
+                return INCONVERTIBLE;
+            }
+            i = l;
+            return SUCCESS;
+            }
+    };
 }
