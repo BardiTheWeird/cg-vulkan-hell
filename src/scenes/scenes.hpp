@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../lve_game_object.hpp"
-#include "../lve_device.hpp"
-#include "../texture_manager.hpp"
-#include "../material_manager.hpp"
-#include "../model_manager.hpp"
+#include "../low-level/lve_device.hpp"
+#include "../managers/texture_manager.hpp"
+#include "../managers/material_manager.hpp"
+#include "../managers/model_manager.hpp"
 
 // std
 #include <vector>

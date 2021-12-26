@@ -1,16 +1,16 @@
 #pragma once
 
-#include "lve_window.hpp"
-#include "lve_device.hpp"
-#include "lve_model.hpp"
+#include "low-level/lve_window.hpp"
+#include "low-level/lve_device.hpp"
+#include "low-level/lve_model.hpp"
 #include "lve_game_object.hpp"
-#include "lve_renderer.hpp"
-#include "lve_descriptors.hpp"
-#include "texture_manager.hpp"
-#include "material_manager.hpp"
-#include "pipeline_manager.hpp"
-#include "game_system_manager.hpp"
-#include "model_manager.hpp"
+#include "low-level/lve_renderer.hpp"
+#include "low-level/lve_descriptors.hpp"
+#include "managers/texture_manager.hpp"
+#include "managers/material_manager.hpp"
+#include "managers/pipeline_manager.hpp"
+#include "managers/game_system_manager.hpp"
+#include "managers/model_manager.hpp"
 
 #define MAX_LIGHT_SOURCES 128
 

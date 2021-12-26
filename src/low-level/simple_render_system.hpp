@@ -1,15 +1,15 @@
 #pragma once
 
-#include "lve_camera.hpp"
+#include "../lve_camera.hpp"
 #include "lve_pipeline.hpp"
 #include "lve_device.hpp"
 #include "lve_model.hpp"
-#include "lve_game_object.hpp"
+#include "../lve_game_object.hpp"
 #include "lve_frame_info.hpp"
-#include "texture_manager.hpp"
-#include "material_manager.hpp"
-#include "pipeline_manager.hpp"
-#include "model_manager.hpp"
+#include "../managers/texture_manager.hpp"
+#include "../managers/material_manager.hpp"
+#include "../managers/pipeline_manager.hpp"
+#include "../managers/model_manager.hpp"
 
 // std
 #include <memory>

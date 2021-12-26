@@ -1,7 +1,7 @@
 #pragma once
 
-#include "lve_camera.hpp"
-#include "lve_game_object.hpp"
+#include "../lve_camera.hpp"
+#include "../lve_game_object.hpp"
 
 // libs
 #include <vulkan/vulkan.h>

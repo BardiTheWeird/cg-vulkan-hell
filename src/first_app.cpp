@@ -1,11 +1,11 @@
 #include "first_app.hpp"
 
+#include "low-level/simple_render_system.hpp"
+#include "low-level/lve_buffer.hpp"
 #include "keyboard_movement_controller.hpp"
-#include "simple_render_system.hpp"
 #include "lve_camera.hpp"
-#include "lve_buffer.hpp"
+#include "managers/pipeline_loader.hpp"
 #include "scenes/scenes.hpp"
-#include "pipeline_loader.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS

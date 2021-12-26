@@ -1,7 +1,7 @@
 #pragma once
 
-#include "lve_device.hpp"
-#include "lve_descriptors.hpp"
+#include "../low-level/lve_device.hpp"
+#include "../low-level/lve_descriptors.hpp"
 
 // std
 #include <string>

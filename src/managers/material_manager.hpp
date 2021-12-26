@@ -1,8 +1,8 @@
 #pragma once
 
-#include "lve_descriptors.hpp"
-#include "lve_buffer.hpp"
-#include "components/material_component.hpp"
+#include "../low-level/lve_descriptors.hpp"
+#include "../low-level/lve_buffer.hpp"
+#include "../components/material_component.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS

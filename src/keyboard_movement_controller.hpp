@@ -1,7 +1,7 @@
 #pragma once
 
+#include "low-level/lve_window.hpp"
 #include "lve_game_object.hpp"
-#include "lve_window.hpp"
 #include "lve_camera.hpp"
 
 namespace lve {

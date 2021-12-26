@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lve_model.hpp"
+#include "low-level/lve_model.hpp"
 #include "components/light_source.hpp"
 #include "components/transform_component.hpp"
 #include "components/velocity_acceleration_component.hpp"

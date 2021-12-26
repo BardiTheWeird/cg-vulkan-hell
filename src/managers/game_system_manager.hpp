@@ -1,9 +1,9 @@
 #pragma once
 
-#include "lve_frame_info.hpp"
-#include "material_manager.hpp"
-#include "simple_render_system.hpp"
-#include "move_event.hpp"
+#include "../low-level/lve_frame_info.hpp"
+#include "../low-level/simple_render_system.hpp"
+#include "../managers/material_manager.hpp"
+#include "../move_event.hpp"
 
 // std
 #include <vector>

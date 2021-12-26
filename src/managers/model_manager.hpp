@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lve_model.hpp"
+#include "../low-level/lve_model.hpp"
 
 // std
 #include <unordered_map>
