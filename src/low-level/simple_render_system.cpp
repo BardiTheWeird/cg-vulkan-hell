@@ -1,6 +1,6 @@
 #include "simple_render_system.hpp"
-#include "push_constants.hpp"
-#include "constants.hpp"
+#include "../push_constants.hpp"
+#include "../constants.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -41,7 +41,6 @@ namespace lve
     }
 
     void SimpleRenderSystem::drawObject(LveGameObject& obj, FrameInfo& frameInfo, VkPipelineLayout pipelineLayout) {
-
         SimplePushConstantData push{};
         push.modelMatrix = obj.transform.mat4();
         push.normalMatrix = obj.transform.normalMatrix();

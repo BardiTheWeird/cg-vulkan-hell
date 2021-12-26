@@ -151,6 +151,10 @@ void LveDevice::pickPhysicalDevice() {
       std::cout << "choice out of bounds\n";
       continue;
     }
+    else if (!isDeviceSuitable(devices[parsed_choice - 1])) {
+      std::cout << "Device is not suitable\n";
+      continue;
+    }
     choice = parsed_choice;
   } while(choice == -1);
 

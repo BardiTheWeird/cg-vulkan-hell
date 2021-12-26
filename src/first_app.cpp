@@ -129,8 +129,6 @@ namespace lve
                 ubo.projectionView = camera.getProjectionMatrix() * camera.getViewMatrix();
                 ubo.cameraPosition = {cameraObject.transform.translation, 0.f};
 
-                // printf("camera position: %f\t%f\t%f\t\n", ubo.cameraPosition.x, ubo.cameraPosition.y, ubo.cameraPosition.z);
-
                 getLightSources(ubo);
 
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
